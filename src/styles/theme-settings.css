@@ -1,0 +1,29 @@
+/* Font Size Variables */
+:root {
+    --font-size-base: 16px;
+}
+
+body {
+    font-size: var(--font-size-base);
+}
+
+.greeting {
+    font-size: calc(var(--font-size-base) * 3.5);
+    /* Scaled title */
+}
+
+.greeting .sub-text {
+    font-size: calc(var(--font-size-base) * 3.5);
+}
+
+.suggestion-card p {
+    font-size: var(--font-size-base);
+}
+
+#chat-input {
+    font-size: var(--font-size-base);
+}
+
+.message .text {
+    font-size: var(--font-size-base);
+}
