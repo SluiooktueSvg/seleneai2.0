@@ -1,0 +1,97 @@
+/* Modern Confirm Modal */
+#confirm-modal-overlay {
+    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.confirm-window {
+    background-color: var(--sidebar-bg);
+    width: 100%;
+    max-width: 380px;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transform: scale(0.9);
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-overlay:not(.hidden) .confirm-window {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.confirm-icon-area {
+    width: 60px;
+    height: 60px;
+    background-color: rgba(255, 77, 77, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.confirm-icon-area svg {
+    width: 32px;
+    height: 32px;
+    stroke: #ff4d4d;
+}
+
+.confirm-content h2 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.confirm-content p {
+    margin: 0 0 25px 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+}
+
+.confirm-actions button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel {
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+
+.btn-cancel:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.btn-danger {
+    background-color: #ff4d4d;
+    border: none;
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 77, 77, 0.3);
+}
+
+.btn-danger:hover {
+    background-color: #ff3333;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(255, 77, 77, 0.4);
+}

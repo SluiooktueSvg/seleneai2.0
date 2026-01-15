@@ -109,21 +109,44 @@ export function initChatArea(user) {
     // 1. Optimistic UI Update (Show immediately)
     appendMessage(messagesArea, text, 'user');
 
-    // 2. Save User Message to DB (Fire and Forget or Log Error)
+    // 2. Lock the Chat ID for this transaction
+    // If it's a new chat, we'll establish the ID after saving the first message.
+    let targetChatId = currentChatId;
+    let isNewChat = !targetChatId;
+
     try {
-      const savedChatId = await ChatHistoryService.saveMessage(user.uid, currentChatId, text, 'user');
-      if (!currentChatId) {
-        currentChatId = savedChatId;
+      // Save User Message
+      const savedChatId = await ChatHistoryService.saveMessage(user.uid, targetChatId, text, 'user');
+
+      // If we started as a new chat, we now have an ID.
+      if (!targetChatId) {
+        targetChatId = savedChatId;
+        // If the user hasn't switched away yet, update the view state.
+        if (!currentChatId) {
+          currentChatId = targetChatId;
+        }
       }
+
+      // AUTO-TITLING behavior (background)
+      if (isNewChat && targetChatId) {
+        (async () => {
+          const title = await GeminiService.generateTitle(text);
+          await ChatHistoryService.updateChatTitle(user.uid, targetChatId, title);
+        })();
+      }
+
     } catch (dbError) {
       console.error("Firestore Error (User Msg):", dbError);
-      // We continue anyway so the user can at least chat with the AI
     }
 
-    // Show AI loading
-    showLoading(messagesArea);
+    // Show AI loading (Only if still looking at the same chat)
+    if (currentChatId === targetChatId) {
+      showLoading(messagesArea);
+    }
 
     try {
+      // Start a fresh session if needed, but really we should manage sessions per chat ID ideally.
+      // For MVP, we just use a generic session.
       if (!chatSession) {
         chatSession = GeminiService.startChat();
       }
@@ -132,22 +155,26 @@ export function initChatArea(user) {
       const response = await result.response;
       const textResponse = response.text();
 
-      removeLoading(messagesArea);
+      // Remove loading (Only if still looking at the same chat)
+      if (currentChatId === targetChatId) {
+        removeLoading(messagesArea);
+      }
 
-      // 3. Save AI Message to DB
-      // If we have a listener active, it might double-render if we append manually + DB listener fires.
-      // A simple fix for MVP: If we have a listener, let the listener render it. 
-      // But for "typing effect", we want manual control.
-      // STRATEGY: We append manually (with effect). 
-      // We concurrently save to DB.
+      // 3. Save AI Message to DB 
+      // CRITICAL: We save to targetChatId, regardless of where the user is looking now.
+      await ChatHistoryService.saveMessage(user.uid, targetChatId, textResponse, 'ai');
 
-      appendMessage(messagesArea, textResponse, 'ai');
-      await ChatHistoryService.saveMessage(user.uid, currentChatId, textResponse, 'ai');
+      // 4. Render (Only if still looking at the same chat)
+      if (currentChatId === targetChatId) {
+        appendMessage(messagesArea, textResponse, 'ai');
+      }
 
     } catch (error) {
       console.error("Gemini Error:", error);
-      removeLoading(messagesArea);
-      appendMessage(messagesArea, "Error de conexión o API Key inválida.", 'ai');
+      if (currentChatId === targetChatId) {
+        removeLoading(messagesArea);
+        appendMessage(messagesArea, "Error de conexión o API Key inválida.", 'ai');
+      }
     }
   };
 

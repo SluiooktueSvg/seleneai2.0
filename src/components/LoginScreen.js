@@ -1,7 +1,7 @@
 export function initLoginScreen(onLogin) {
-    const container = document.createElement('div');
-    container.className = 'login-container';
-    container.innerHTML = `
+  const container = document.createElement('div');
+  container.className = 'login-container';
+  container.innerHTML = `
     <div class="login-card">
       <div class="logo-circle">
         <div class="star-icon">✦</div>
@@ -18,24 +18,24 @@ export function initLoginScreen(onLogin) {
     </div>
   `;
 
-    const loginBtn = container.querySelector('#google-login-btn');
-    const errorMsg = container.querySelector('#login-error');
+  const loginBtn = container.querySelector('#google-login-btn');
+  const errorMsg = container.querySelector('#login-error');
 
-    loginBtn.addEventListener('click', async () => {
-        loginBtn.classList.add('loading');
-        loginBtn.disabled = true;
-        errorMsg.classList.add('hidden');
+  loginBtn.addEventListener('click', async () => {
+    loginBtn.classList.add('loading');
+    loginBtn.disabled = true;
+    errorMsg.classList.add('hidden');
 
-        try {
-            await onLogin();
-        } catch (err) {
-            console.error(err);
-            errorMsg.textContent = "Error al iniciar sesión. Verifica tu configuración de Firebase.";
-            errorMsg.classList.remove('hidden');
-            loginBtn.classList.remove('loading');
-            loginBtn.disabled = false;
-        }
-    });
+    try {
+      await onLogin();
+    } catch (err) {
+      console.error(err);
+      errorMsg.textContent = `Error: ${err.code} - ${err.message}`;
+      errorMsg.classList.remove('hidden');
+      loginBtn.classList.remove('loading');
+      loginBtn.disabled = false;
+    }
+  });
 
-    return container;
+  return container;
 }

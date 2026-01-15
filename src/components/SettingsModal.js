@@ -1,4 +1,4 @@
-export function initSettingsModal() {
+export function initSettingsModal(onLogout) {
   // Create modal container
   const modalOverlay = document.createElement('div');
   modalOverlay.className = 'modal-overlay hidden';
@@ -51,6 +51,15 @@ export function initSettingsModal() {
             </label>
           </div>
         </div>
+
+        <div class="setting-separator"></div>
+
+        <div class="setting-item">
+          <button id="logout-btn" class="logout-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            Cerrar Sesión
+          </button>
+        </div>
       </div>
     </div>
   `;
@@ -62,6 +71,7 @@ export function initSettingsModal() {
   const fontSizeSelect = modalOverlay.querySelector('#font-size-select');
   const speedSelect = modalOverlay.querySelector('#speed-select');
   const animationsToggle = modalOverlay.querySelector('#animations-toggle');
+  const logoutBtn = modalOverlay.querySelector('#logout-btn');
 
   const closeModal = () => modalOverlay.classList.add('hidden');
   const openModal = () => modalOverlay.classList.remove('hidden');
@@ -69,6 +79,13 @@ export function initSettingsModal() {
   closeBtn.addEventListener('click', closeModal);
   modalOverlay.addEventListener('click', (e) => {
     if (e.target === modalOverlay) closeModal();
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    if (onLogout) {
+      onLogout();
+      closeModal();
+    }
   });
 
   // Apply Settings

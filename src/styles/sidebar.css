@@ -73,6 +73,8 @@
 .chat-item {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    /* Space between title and actions */
     gap: var(--spacing-sm);
     width: 100%;
     background: none;
@@ -83,9 +85,58 @@
     cursor: pointer;
     text-align: left;
     font-size: 14px;
+    overflow: hidden;
+    position: relative;
+    /* For positioning actions if needed */
+}
+
+.chat-info-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex: 1;
+    overflow: hidden;
+    min-width: 0;
+    /* Enable truncation in flex child */
+}
+
+.chat-title {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.chat-actions {
+    display: none;
+    align-items: center;
+    margin-left: 4px;
+}
+
+.chat-item:hover .chat-actions {
+    display: flex;
+}
+
+.delete-chat-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.delete-chat-btn:hover {
+    color: #ff4d4d;
+    background-color: rgba(255, 77, 77, 0.1);
+}
+
+.delete-chat-btn svg {
+    width: 18px;
+    height: 18px;
 }
 
 .chat-item:hover {
@@ -205,5 +256,5 @@
 
 .chat-item {
     animation: slideIn 0.3s ease-out forwards;
-    opacity: 0;
+    opacity: 1;
 }

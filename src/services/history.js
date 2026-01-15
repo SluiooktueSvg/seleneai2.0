@@ -7,7 +7,11 @@ import {
     onSnapshot,
     serverTimestamp,
     doc,
-    setDoc
+    setDoc,
+    deleteDoc,
+    where,
+    getDocs,
+    writeBatch
 } from "firebase/firestore";
 
 export const ChatHistoryService = {
@@ -85,6 +89,32 @@ export const ChatHistoryService = {
             await setDoc(chatDocRef, { title: title }, { merge: true });
         } catch (error) {
             console.error("Error updating chat title:", error);
+        }
+    },
+
+    // Delete a chat and its messages
+    deleteChat: async (userId, chatId) => {
+        if (!userId || !chatId) return;
+
+        try {
+            // 1. Delete all messages in the subcollection
+            // tailored for client-side SDK where recursive delete isn't automatic
+            const messagesRef = collection(db, 'users', userId, 'chats', chatId, 'messages');
+            const snapshot = await getDocs(messagesRef);
+
+            const batch = writeBatch(db);
+            snapshot.docs.forEach((doc) => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit();
+
+            // 2. Delete the chat document
+            const chatDocRef = doc(db, 'users', userId, 'chats', chatId);
+            await deleteDoc(chatDocRef);
+
+        } catch (error) {
+            console.error("Error deleting chat:", error);
+            throw error;
         }
     }
 };

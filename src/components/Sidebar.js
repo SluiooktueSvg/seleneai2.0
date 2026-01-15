@@ -1,7 +1,8 @@
 import { ChatHistoryService } from '../services/history';
 
-export function initSidebar(onNewChat, onOpenSettings, user) {
+export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
   const sidebar = document.getElementById('sidebar');
+  // ... (rest of code)
 
   // Default values or user data
   const photoURL = user?.photoURL || 'https://via.placeholder.com/32';
@@ -83,26 +84,44 @@ export function initSidebar(onNewChat, onOpenSettings, user) {
         const btn = document.createElement('button');
         btn.className = 'chat-item';
         btn.dataset.id = chat.id; // Store ID
-        
+
         // Stagger Animation
         btn.style.animationDelay = `${index * 0.05}s`;
-        
+
         btn.innerHTML = `
-                  <svg viewBox="0 0 24 24" class="chat-icon"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"></path></svg>
-                  <span class="chat-title collapsed-hide">${chat.title}</span>
+                  <div class="chat-info-row">
+                      <svg viewBox="0 0 24 24" class="chat-icon"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"></path></svg>
+                      <span class="chat-title collapsed-hide">${chat.title}</span>
+                  </div>
+                  <div class="chat-actions collapsed-hide">
+                      <button class="delete-chat-btn" title="Eliminar conversación">
+                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                      </button>
+                  </div>
               `;
 
-        btn.addEventListener('click', () => {
+        // Click on Chat Item
+        btn.addEventListener('click', (e) => {
+          // Prevent triggering if clicked on delete button
+          if (e.target.closest('.delete-chat-btn')) return;
+
           // UI Active State
           const all = sidebar.querySelectorAll('.chat-item');
           all.forEach(x => x.classList.remove('active'));
           btn.classList.add('active');
 
-          // Trigger Load (We need to pass this callback or use event)
-          // For now, let's dispatch a custom event that Main.js or ChatArea listens to
           const event = new CustomEvent('load-chat', { detail: { chatId: chat.id } });
           document.dispatchEvent(event);
         });
+
+        // Click on Delete Button
+        const deleteBtn = btn.querySelector('.delete-chat-btn');
+        if (deleteBtn) {
+          deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Stop bubble
+            if (onDeleteChat) onDeleteChat(chat.id);
+          });
+        }
 
         chatListContainer.appendChild(btn);
       });

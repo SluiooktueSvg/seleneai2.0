@@ -154,3 +154,45 @@ body.no-animations * {
     animation: none !important;
     transition: none !important;
 }
+
+/* Logout Section */
+.setting-separator {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.08);
+    margin: 20px 0;
+}
+
+.logout-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    color: #ff6b6b;
+    /* Soft Red */
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logout-btn:hover {
+    background: rgba(255, 107, 107, 0.1);
+    border-color: rgba(255, 107, 107, 0.3);
+    transform: translateY(-1px);
+}
+
+.logout-btn:active {
+    transform: scale(0.98);
+}
+
+.logout-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2px;
+}
