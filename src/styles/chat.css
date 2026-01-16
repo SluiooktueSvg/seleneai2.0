@@ -403,3 +403,28 @@
 .chip-close:hover {
     color: #ff4d4d;
 }
+
+/* Animated Selene Text */
+.selene-text {
+    background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    /* Fallback */
+    animation: rainbow 6s linear infinite;
+    font-weight: bold;
+    display: inline-block;
+    /* Ensure it respects transform/clip */
+}
+
+@keyframes rainbow {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 100% 50%;
+    }
+}
