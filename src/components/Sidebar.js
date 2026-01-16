@@ -8,6 +8,30 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
   const photoURL = user?.photoURL || 'https://via.placeholder.com/32';
   const email = user?.email || 'usuario@example.com';
 
+  // Mobile Toggle Logic
+  if (!document.getElementById('mobile-menu-toggle')) {
+    const mobileBtn = document.createElement('button');
+    mobileBtn.id = 'mobile-menu-toggle';
+    mobileBtn.className = 'mobile-menu-toggle';
+    mobileBtn.innerHTML = '<svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg>';
+    document.body.appendChild(mobileBtn);
+
+    mobileBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768 &&
+        sidebar.classList.contains('open') &&
+        !sidebar.contains(e.target) &&
+        e.target !== mobileBtn &&
+        !mobileBtn.contains(e.target)) {
+        sidebar.classList.remove('open');
+      }
+    });
+  }
+
   sidebar.innerHTML = `
     <div class="sidebar-header">
       <button class="menu-btn" aria-label="Menu">

@@ -3,16 +3,15 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
-// TODO: Replace with your actual Firebase project config
-// You can get this from the Firebase Console -> Project Settings -> General -> Your Apps -> SDK toggle
+// Configuration from environment variables
 const firebaseConfig = {
-    apiKey: "AIzaSyAWxGW_aBJleDgYaw8-os0mjrmwSd9myVA",
-    authDomain: "seleneai2-0.firebaseapp.com",
-    projectId: "seleneai2-0",
-    storageBucket: "seleneai2-0.firebasestorage.app",
-    messagingSenderId: "751943562908",
-    appId: "1:751943562908:web:e397185e6c447c2934df59",
-    measurementId: "G-29ES7SQWDE"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
