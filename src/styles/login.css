@@ -1,98 +1,220 @@
-/* Login Screen Styles */
+/* Login Screen Styles - Premium Cosmos Theme */
 .login-container {
-    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Stars Background Effect */
+.login-container::before {
+    content: "";
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100vh;
-    background-color: var(--bg-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
+    right: 0;
+    bottom: 0;
+    background-image:
+        radial-gradient(2px 2px at 20px 30px, #eee, rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 40px 70px, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 90px 40px, #fff, rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0, 0, 0, 0));
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    animation: starsMove 100s linear infinite;
+    opacity: 0.5;
+    z-index: 0;
 }
 
-.login-card {
-    background-color: var(--sidebar-bg);
-    /* Darker card */
-    padding: 48px;
-    border-radius: 24px;
-    text-align: center;
-    width: 100%;
-    max-width: 400px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.logo-circle {
-    width: 64px;
-    height: 64px;
-    background: linear-gradient(135deg, #4285F4, #9B72CB);
+/* Floating Orb Effect */
+.orb {
+    position: absolute;
     border-radius: 50%;
+    filter: blur(80px);
+    z-index: 0;
+    opacity: 0.6;
+    animation: orbFloat 20s infinite ease-in-out;
+}
+
+.orb-1 {
+    width: 300px;
+    height: 300px;
+    background: #4285F4;
+    top: -50px;
+    left: -50px;
+}
+
+.orb-2 {
+    width: 400px;
+    height: 400px;
+    background: #9B72CB;
+    bottom: -100px;
+    right: -100px;
+    animation-delay: -5s;
+}
+
+/* Login Card - Glassmorphism */
+.login-card {
+    background: rgba(30, 31, 32, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 60px 40px;
+    border-radius: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    max-width: 420px;
+    width: 90%;
+    z-index: 10;
+    animation: cardEntry 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Logo Animation */
+.logo-circle {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #1E1F20, #303133);
+    border-radius: 50%;
+    margin: 0 auto 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 24px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: floatLogo 6s ease-in-out infinite;
 }
 
 .star-icon {
-    font-size: 32px;
-    color: white;
+    font-size: 40px;
+    background: linear-gradient(to right, #4285F4, #9B72CB, #D96570);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rotateStar 20s linear infinite;
 }
 
-h1 {
-    font-size: 28px;
+.login-card h1 {
+    font-size: 32px;
     font-weight: 500;
+    color: #E3E3E3;
     margin-bottom: 8px;
-    color: var(--text-main);
+    letter-spacing: -0.5px;
 }
 
 .subtitle {
-    color: var(--text-secondary);
-    margin-bottom: 32px;
+    color: #C4C7C5;
+    font-size: 16px;
+    margin-bottom: 40px;
+    font-weight: 400;
 }
 
+/* Google Button - Premium */
 .google-btn {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
-    background-color: white;
-    color: #3c4043;
-    border: none;
-    border-radius: 4px;
-    /* Standard Google button radius */
-    padding: 12px 24px;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 500;
-    font-size: 16px;
-    cursor: pointer;
     width: 100%;
-    transition: background-color 0.2s;
+    background-color: #FFFFFF;
+    color: #1F1F1F;
+    border: none;
+    padding: 14px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 32px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
 }
 
 .google-btn:hover {
-    background-color: #f1f3f4;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    background-color: #F8F9FA;
 }
 
-.google-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
+.google-btn:active {
+    transform: translateY(0);
 }
 
 .google-icon {
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
 }
 
 .error-msg {
-    color: #EA4335;
+    margin-top: 20px;
+    color: #FF8989;
     font-size: 14px;
-    margin-top: 16px;
+    background: rgba(255, 0, 0, 0.1);
+    padding: 10px;
+    border-radius: 8px;
 }
 
 .hidden {
-    display: none !important;
+    display: none;
+}
+
+/* Animations */
+@keyframes starsMove {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: -1000px 1000px;
+    }
+}
+
+@keyframes orbFloat {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(20px, 40px);
+    }
+}
+
+@keyframes cardEntry {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes floatLogo {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes rotateStar {
+    from {
+        filter: hue-rotate(0deg);
+    }
+
+    to {
+        filter: hue-rotate(360deg);
+    }
 }

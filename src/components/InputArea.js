@@ -4,7 +4,7 @@ export function initInputArea(onSend) {
 
   container.innerHTML = `
     <div class="input-box">
-      <button class="icon-btn" aria-label="Upload image">
+      <button class="icon-btn" id="upload-btn" aria-label="Adjuntar imagen" data-tooltip="Adjuntar imagen">
         <svg viewBox="0 0 24 24"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"></path></svg>
       </button>
       
@@ -16,10 +16,10 @@ export function initInputArea(onSend) {
           rows="1"
         ></textarea>
       </div>
-      <button class="icon-btn" aria-label="Use microphone">
+      <button class="icon-btn" id="mic-btn" aria-label="Usar micrófono" data-tooltip="Usar micrófono">
         <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"></path><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"></path></svg>
       </button>
-      <button id="send-btn" class="send-btn icon-btn" aria-label="Send message" disabled>
+      <button id="send-btn" class="send-btn icon-btn" aria-label="Enviar mensaje" data-tooltip="Enviar mensaje" disabled>
         <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
       </button>
     </div>
@@ -119,6 +119,33 @@ export function initInputArea(onSend) {
       handleSend();
     }
   });
+
+  // Feature Not Available Modal Logic
+  const showModal = () => {
+    const modal = document.createElement('div');
+    modal.className = 'feature-modal-overlay';
+    modal.innerHTML = `
+        <div class="feature-modal">
+            <h2>Función no disponible</h2>
+            <p>Lo sentimos, esta funcionalidad aún no está activa en esta versión. Estamos trabajando duro para traerla pronto.</p>
+            <button class="close-btn">Entendido</button>
+        </div>
+      `;
+    document.body.appendChild(modal);
+
+    const close = () => {
+      modal.style.opacity = '0';
+      setTimeout(() => modal.remove(), 300);
+    };
+
+    modal.querySelector('.close-btn').addEventListener('click', close);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) close();
+    });
+  };
+
+  container.querySelector('#upload-btn').addEventListener('click', showModal);
+  container.querySelector('#mic-btn').addEventListener('click', showModal);
 
   return { element: container, addChip };
 }

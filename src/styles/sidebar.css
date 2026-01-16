@@ -5,8 +5,10 @@
     display: flex;
     flex-direction: column;
     padding: var(--spacing-sm) var(--spacing-sm);
-    transition: transform 0.3s ease;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease, transform 0.3s ease;
     height: 100vh;
+    overflow: hidden;
+    /* Ensure content doesn't spill during transition */
 }
 
 .sidebar-header {
