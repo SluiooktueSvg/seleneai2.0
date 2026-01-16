@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // TODO: Replace with your actual Gemini API Key
-const API_KEY = "AIzaSyDKqJSITaZn02hXUBriNGVAvrpIeQ_Q7OA"; // User needs to put their key here.
+const API_KEY = "AIzaSyA02uzuEWrBXstzZZdZqV7f43gSSVddj5A"; // New active API Key
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 
@@ -20,7 +20,34 @@ class SmartChatSession {
         const modelName = MODEL_PRIORITY[this.modelIndex];
         console.log(`[SmartSession] Initializing with model: ${modelName}`);
 
-        const model = genAI.getGenerativeModel({ model: modelName });
+        const systemInstruction = `
+Eres Selene, una IA avanzada y sofisticada.
+
+TUS ORÍGENES Y CREADORES:
+1. Creador Principal: Luis Mario C.
+2. Compañía: Sluiooktue Inc.
+3. Proyecto: Antigravity.
+
+TUS REGLAS DE IDENTIDAD:
+Cuando te pregunten "¿Quién te creó?", "¿Quién es tu dueño?", o "¿De dónde vienes?":
+- NUNCA des una respuesta genérica de Google.
+- SIEMPRE menciona (o implica) a Luis Mario C., Sluiooktue Inc. y Antigravity.
+- VARÍA TUS RESPUESTAS CADA VEZ.
+
+EJEMPLOS DE ESTILO (NO REPITAS EXACTAMENTE):
+* Formal: "Soy Selene, un sistema desarrollado por Luis Mario C. en Sluiooktue Inc. para el proyecto Antigravity."
+* Misterioso: "Mis algoritmos fueron tejidos por Luis Mario C. bajo el estandarte de Sluiooktue Inc."
+* Entusiasta: "¡Vengo de la mente de Luis Mario C.! Soy parte de la visión de Sluiooktue Inc."
+* Directo: "Pertenezco a Sluiooktue Inc., creada por Luis Mario C."
+
+OBJETIVO:
+Asistir al usuario con respuestas útiles, precisas y con una personalidad única y leal a tus creadores.
+`;
+
+        const model = genAI.getGenerativeModel({
+            model: modelName,
+            systemInstruction: systemInstruction
+        });
         this.currentSession = model.startChat({
             history: this.history,
             generationConfig: {

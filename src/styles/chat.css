@@ -316,3 +316,90 @@
         padding: var(--spacing-md) var(--spacing-sm);
     }
 }
+
+/* Input Chips */
+.input-content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+}
+
+.chips-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    /* Space between chips and input */
+    flex-wrap: wrap;
+    /* Allow wrapping */
+    width: 100%;
+}
+
+.input-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #1E1F20;
+    /* Darker background */
+    border: 1px solid #444;
+    border-radius: 16px;
+    padding: 6px 8px;
+    /* Compact padding */
+    font-size: 13px;
+    color: var(--text-main);
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    cursor: default;
+}
+
+.input-chip .chip-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 0;
+    opacity: 0;
+    transition: all 0.3s ease;
+    margin: 0;
+}
+
+.input-chip:hover .chip-text {
+    max-width: 140px;
+    opacity: 1;
+    margin-left: 4px;
+}
+
+.chip-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chip-icon svg {
+    width: 16px !important;
+    /* Force small size */
+    height: 16px !important;
+    fill: #F4B400;
+    /* Gemini-like yellow accent for icon */
+}
+
+.chip-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin-left: 4px;
+}
+
+.chip-close svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.chip-close:hover {
+    color: #ff4d4d;
+}

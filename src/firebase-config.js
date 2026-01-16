@@ -6,7 +6,7 @@ import { getFirestore } from "firebase/firestore";
 // TODO: Replace with your actual Firebase project config
 // You can get this from the Firebase Console -> Project Settings -> General -> Your Apps -> SDK toggle
 const firebaseConfig = {
-    apiKey: "AIzaSyB9jKeSM_Rc39Zqp0mTC7e8j7b23tuAN2c",
+    apiKey: "AIzaSyAWxGW_aBJleDgYaw8-os0mjrmwSd9myVA",
     authDomain: "seleneai2-0.firebaseapp.com",
     projectId: "seleneai2-0",
     storageBucket: "seleneai2-0.firebasestorage.app",

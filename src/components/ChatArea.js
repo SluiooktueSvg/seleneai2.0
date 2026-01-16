@@ -24,7 +24,8 @@ export function initChatArea(user) {
   // Welcome Hero (Initially visible)
   const createWelcomeHero = () => {
     const hero = document.createElement('div');
-    const userName = user?.displayName ? user.displayName.split(' ')[0] : 'Human';
+    const nameToUse = user.preferredName || user.displayName || 'Human';
+    const userName = nameToUse.split(' ')[0];
 
     hero.className = 'welcome-hero';
     hero.innerHTML = `
@@ -179,8 +180,26 @@ export function initChatArea(user) {
   };
 
   // Initialize Input Area
-  const inputArea = initInputArea(onSend);
-  chatContainer.appendChild(inputArea);
+  const { element: inputElement, addChip } = initInputArea(onSend);
+  chatContainer.appendChild(inputElement);
+
+  // Suggested Actions Click Handler (Moved here to access addChip)
+  const attachSuggestionListeners = () => {
+    const cards = messagesArea.querySelectorAll('.suggestion-card');
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        const text = card.querySelector('p').innerText;
+        const icon = card.querySelector('.icon-box').innerHTML; // Get SVG
+
+        // Add as chip instead of text
+        addChip(text, icon);
+
+        const input = document.getElementById('chat-input');
+        if (input) input.focus();
+      });
+    });
+  };
+  attachSuggestionListeners();
 
   // Return control methods
   return {
