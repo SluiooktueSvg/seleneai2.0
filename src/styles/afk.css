@@ -1,0 +1,74 @@
+/* AFK Overlay */
+.afk-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1s ease, visibility 1s ease;
+    cursor: none;
+    /* Hide cursor for immersion */
+}
+
+.afk-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Logo in AFK */
+.afk-logo-container {
+    margin-bottom: 60px;
+    transform: scale(1.5);
+    opacity: 0.8;
+}
+
+/* Facts Container */
+.afk-facts-container {
+    max-width: 800px;
+    text-align: center;
+    padding: 0 40px;
+}
+
+.afk-fact {
+    font-size: 32px;
+    font-weight: 300;
+    color: #E3E3E3;
+    line-height: 1.4;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1s ease, transform 1s ease;
+    display: none;
+    /* Hidden by default */
+}
+
+.afk-fact.visible {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.afk-fact strong {
+    color: #4285F4;
+    font-weight: 500;
+}
+
+/* Subtle Progress Bar */
+.afk-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4285F4, #9B72CB, #D96570);
+    width: 0%;
+    transition: width 10s linear;
+    /* Matches fact duration */
+}

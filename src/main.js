@@ -17,6 +17,7 @@ import { initOnboarding } from './components/Onboarding';
 
 import { ConfirmModal } from './components/ConfirmModal';
 import { ChatHistoryService } from './services/history';
+import { initAFKMode } from './components/AFKMode';
 
 // Initialize components
 document.addEventListener('DOMContentLoaded', () => {
@@ -42,6 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const chatController = initChatArea(finalUser);
             const settingsModal = initSettingsModal(AuthService.logout);
             const confirmModal = new ConfirmModal();
+
+            // Init AFK Mode
+            initAFKMode();
 
             initSidebar(
                 () => chatController.reset(),
