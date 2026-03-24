@@ -87,8 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Selene Clone Initialized for', finalUser.displayName);
         };
 
-        // FORCE ONBOARDING FOR TESTING: Added '|| true'
-        if (!profile || !profile.onboardingComplete || true) {
+        // FORCE ONBOARDING FOR TESTING: Added '|| true'??  CAMBIO DE PRUUEBAS...... DE ONBOARDING DE PRUUEBAS 
+        if (!profile || !profile.onboardingComplete) {
+
+            // CAMBIAR AQUI PRUEBAS DE ONBOARDING.....
+
+
             // New User or Incomplete Onboarding
             await UserService.createUserProfile(user); // Ensure doc exists
             const onboardingScreen = initOnboarding(user, (updatedUser) => {
