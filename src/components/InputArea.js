@@ -75,7 +75,9 @@ export function initInputArea(onSend) {
 
   textarea.addEventListener('input', () => {
     textarea.style.height = 'auto';
-    textarea.style.height = textarea.scrollHeight + 'px';
+    const maxInputHeight = 140;
+    const nextHeight = Math.min(textarea.scrollHeight, maxInputHeight);
+    textarea.style.height = nextHeight + 'px';
     updateSendButton();
   });
 
