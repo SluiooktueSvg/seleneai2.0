@@ -1,13 +1,11 @@
-/* AFK Overlay */
+/* AFK Overlay - Fondo Estático Optimizado */
 .afk-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.85);
+    inset: 0;
+    /* Un gradiente radial sutil sobre negro puro */
+    background: radial-gradient(circle at center, #111115 0%, #000000 100%);
     backdrop-filter: blur(20px);
-    z-index: 9999;
+    z-index: 10000;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -16,7 +14,8 @@
     visibility: hidden;
     transition: opacity 1s ease, visibility 1s ease;
     cursor: none;
-    /* Hide cursor for immersion */
+    overflow: hidden;
+    color-scheme: dark; /* Ayuda a los navegadores a optimizar colores oscuros */
 }
 
 .afk-overlay.active {
@@ -24,51 +23,104 @@
     visibility: visible;
 }
 
-/* Logo in AFK */
-.afk-logo-container {
-    margin-bottom: 60px;
-    transform: scale(1.5);
-    opacity: 0.8;
+/* Viñeta estática para dar profundidad sin coste de CPU */
+.afk-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.8) 100%);
+    z-index: 1;
+    pointer-events: none;
 }
 
-/* Facts Container */
-.afk-facts-container {
-    max-width: 800px;
+/* Contenido Principal */
+.afk-content {
+    position: relative;
+    z-index: 2;
     text-align: center;
+    max-width: 900px;
     padding: 0 40px;
+    will-change: transform, opacity; /* Pista de optimización para el navegador */
+}
+
+/* Logo Animado (Pequeño y barato) */
+.afk-icon {
+    width: 60px;
+    height: 60px;
+    fill: #4285F4;
+    filter: drop-shadow(0 0 10px rgba(66, 133, 244, 0.4));
+    margin-bottom: 40px;
+    /* La animación de escala es más barata que las sombras complejas */
+    animation: afk-pulse 5s ease-in-out infinite;
+}
+
+/* Etiquetas de Datos */
+.fact-label {
+    font-size: 11px;
+    letter-spacing: 5px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 25px;
+    font-weight: 700;
+    text-transform: uppercase;
 }
 
 .afk-fact {
-    font-size: 32px;
+    font-size: clamp(22px, 4vw, 36px);
     font-weight: 300;
-    color: #E3E3E3;
-    line-height: 1.4;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 1s ease, transform 1s ease;
-    display: none;
-    /* Hidden by default */
-}
-
-.afk-fact.visible {
-    display: block;
-    opacity: 1;
-    transform: translateY(0);
+    color: #ffffff;
+    line-height: 1.5;
+    transition: all 0.8s ease;
 }
 
 .afk-fact strong {
-    color: #4285F4;
-    font-weight: 500;
+    color: #7BB0FF; /* Azul claro más legible sin gradiente para optimizar */
+    font-weight: 600;
 }
 
-/* Subtle Progress Bar */
-.afk-progress {
+/* Footer y Progreso Minimalista */
+.afk-footer {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #4285F4, #9B72CB, #D96570);
-    width: 0%;
-    transition: width 10s linear;
-    /* Matches fact duration */
+    bottom: 8vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    z-index: 2;
+}
+
+.exit-text {
+    color: rgba(255,255,255,0.3);
+    font-size: 13px;
+    letter-spacing: 1px;
+    font-weight: 300;
+}
+
+.progress-track {
+    width: 180px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+/* Usar transform: scaleX(0) es 10x más rápido que animar width */
+.afk-progress {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #4285F4, #D96570);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 12s linear; /* Matches fact duration */
+}
+
+/* Animación de Pulso Ligera */
+@keyframes afk-pulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+.fact-highlight {
+    color: #4285F4; /* O el color principal de Elai */
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(66, 133, 244, 0.3); /* Un brillo sutil */
 }

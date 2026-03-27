@@ -2,7 +2,6 @@ import { ChatHistoryService } from '../services/history';
 
 export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
   const sidebar = document.getElementById('sidebar');
-  // ... (rest of code)
 
   // Default values or user data
   const photoURL = user?.photoURL || 'https://via.placeholder.com/32';
@@ -46,7 +45,6 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
     <div class="recent-chats">
       <div class="section-title collapsed-hide">Recientes</div>
       <div id="chat-list-container">
-          <!-- Real chats will be injected here -->
           <div class="loading-chats collapsed-hide">
              <div class="skeleton-loader">
                <div class="skeleton-item"></div>
@@ -64,6 +62,14 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
              <span class="user-email">${email}</span>
         </div>
       </button>
+
+      <div class="ad-sidebar-wrapper collapsed-hide" style="display: flex; justify-content: center; padding: 10px 0; overflow: hidden;">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:250px;height:50px"
+             data-ad-client="ca-pub-1784417792538018"
+             data-ad-slot="7264549058"></ins>
+      </div>
+
       <button class="footer-btn" id="settings-btn">
         <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.58 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"></path></svg>
         <span class="collapsed-hide">Ajustes</span>
@@ -77,15 +83,21 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
   const newChatBtn = sidebar.querySelector('#new-chat-btn');
   const chatListContainer = sidebar.querySelector('#chat-list-container');
 
+  // Activar el anuncio de Google
+  try {
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+  } catch (e) {
+    console.error("AdSense push error:", e);
+  }
+
   menuBtn.addEventListener('click', () => {
     sidebar.classList.toggle('collapsed');
   });
 
   newChatBtn.addEventListener('click', () => {
-    // Remove active class from all items
     const items = sidebar.querySelectorAll('.chat-item');
     items.forEach(i => i.classList.remove('active'));
-    onNewChat(); // Trigger new chat logic
+    onNewChat(); 
   });
 
   if (settingsBtn) {
@@ -97,7 +109,7 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
   // Real Chat History Subscription
   if (user && user.uid) {
     ChatHistoryService.subscribeToChatList(user.uid, (chats) => {
-      chatListContainer.innerHTML = ''; // Clear loading/old
+      chatListContainer.innerHTML = ''; 
 
       if (chats.length === 0) {
         chatListContainer.innerHTML = '<div style="padding:10px; font-size:12px; color:#888" class="collapsed-hide">No hay chats recientes</div>';
@@ -107,9 +119,7 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
       chats.forEach((chat, index) => {
         const btn = document.createElement('button');
         btn.className = 'chat-item';
-        btn.dataset.id = chat.id; // Store ID
-
-        // Stagger Animation
+        btn.dataset.id = chat.id; 
         btn.style.animationDelay = `${index * 0.05}s`;
 
         btn.innerHTML = `
@@ -119,17 +129,13 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
                   </div>
                   <div class="chat-actions collapsed-hide">
                       <button class="delete-chat-btn" title="Eliminar conversación">
-                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                       </button>
                   </div>
               `;
 
-        // Click on Chat Item
         btn.addEventListener('click', (e) => {
-          // Prevent triggering if clicked on delete button
           if (e.target.closest('.delete-chat-btn')) return;
-
-          // UI Active State
           const all = sidebar.querySelectorAll('.chat-item');
           all.forEach(x => x.classList.remove('active'));
           btn.classList.add('active');
@@ -138,11 +144,10 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
           document.dispatchEvent(event);
         });
 
-        // Click on Delete Button
         const deleteBtn = btn.querySelector('.delete-chat-btn');
         if (deleteBtn) {
           deleteBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Stop bubble
+            e.stopPropagation();
             if (onDeleteChat) onDeleteChat(chat.id);
           });
         }

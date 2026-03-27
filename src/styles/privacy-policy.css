@@ -1,0 +1,143 @@
+.privacy-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.68);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.privacy-modal-window {
+    width: 100%;
+    max-width: 560px;
+    max-height: min(88vh, 720px);
+    overflow: hidden;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, #1f2126 0%, #18191d 100%);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+    color: var(--text-main);
+    transform: translateY(8px) scale(0.98);
+    opacity: 0;
+    animation: privacy-modal-fade-in 0.24s ease forwards;
+}
+
+.privacy-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 28px;
+    overflow-y: auto;
+    max-height: min(88vh, 720px);
+    scrollbar-width: thin;
+    scrollbar-color: #444ebb transparent;
+}
+
+.privacy-modal-content h2 {
+    margin: 0 0 4px 0;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-main);
+}
+
+.privacy-modal-content p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+}
+
+.privacy-modal-note {
+    margin-top: 4px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(168, 199, 250, 0.16);
+    background: rgba(168, 199, 250, 0.08);
+    color: var(--text-main);
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.privacy-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 8px;
+}
+
+.privacy-accept-btn {
+    min-width: 200px;
+    padding: 13px 20px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #7e6bff 0%, #5a7fff 100%);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(90, 127, 255, 0.28);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.privacy-accept-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px rgba(90, 127, 255, 0.34);
+    filter: brightness(1.04);
+}
+
+.privacy-accept-btn:active {
+    transform: translateY(0);
+}
+
+.privacy-accept-btn:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 3px;
+}
+
+.fade-in {
+    animation: privacy-modal-fade-in 0.24s ease forwards;
+}
+
+@keyframes privacy-modal-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (max-width: 640px) {
+    .privacy-modal-overlay {
+        padding: 16px;
+    }
+
+    .privacy-modal-window {
+        max-height: 90vh;
+        border-radius: 18px;
+    }
+
+    .privacy-modal-content {
+        padding: 22px 18px;
+    }
+
+    .privacy-modal-content h2 {
+        font-size: 21px;
+    }
+
+    .privacy-modal-actions {
+        justify-content: stretch;
+    }
+
+    .privacy-accept-btn {
+        width: 100%;
+        min-width: 0;
+    }
+}
