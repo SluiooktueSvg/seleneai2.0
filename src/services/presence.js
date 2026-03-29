@@ -12,12 +12,24 @@ export const PresenceService = {
     // Listener cleanup function
     connectedRefUnsubscribe: null,
 
+    // Store user data for updates
+    currentUserData: null,
+
     /**
      * Inicializa el sistema de presencia para un usuario
      * @param {string} userId - UID del usuario
+     * @param {object} userData - Datos del usuario (displayName, email, photoURL)
      */
-    init(userId) {
+    init(userId, userData = {}) {
         if (!userId) return;
+
+        // Store user data for later updates
+        this.currentUserData = {
+            odisplayName: userData.displayName || 'Usuario',
+            email: userData.email || '',
+            photoURL: userData.photoURL || '',
+            uid: userId
+        };
 
         // Reference to this user's status node
         this.userStatusRef = ref(rtdb, `/status/${userId}`);
@@ -26,18 +38,53 @@ export const PresenceService = {
         // This is a special location in RTDB that is true when connected
         const connectedRef = ref(rtdb, '.info/connected');
 
-        // Status when user is online
-        const isOnlineStatus = {
-            isOnline: true,
-            lastSeen: serverTimestamp(),
-            lastActive: serverTimestamp()
+        // Helper to get current timestamp as readable string
+        const getTimestampData = () => {
+            const now = new Date();
+            return {
+                timestamp: serverTimestamp(),
+                readable: now.toLocaleString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                }),
+                iso: now.toISOString()
+            };
         };
 
+        // Status when user is online
+        const getOnlineStatus = () => ({
+            // User Info
+            displayName: this.currentUserData.displayName,
+            email: this.currentUserData.email,
+            photoURL: this.currentUserData.photoURL,
+            uid: userId,
+            // Presence Info
+            isOnline: true,
+            isAway: false,
+            // Timestamps
+            lastSeen: getTimestampData(),
+            lastActive: getTimestampData(),
+            connectedAt: getTimestampData()
+        });
+
         // Status when user is offline (set by onDisconnect)
-        const isOfflineStatus = {
+        const getOfflineStatus = () => ({
+            // User Info (preserve it)
+            displayName: this.currentUserData.displayName,
+            email: this.currentUserData.email,
+            photoURL: this.currentUserData.photoURL,
+            uid: userId,
+            // Presence Info
             isOnline: false,
-            lastSeen: serverTimestamp()
-        };
+            isAway: false,
+            // Timestamps
+            lastSeen: getTimestampData(),
+            disconnectedAt: getTimestampData()
+        });
 
         // Listen for connection state changes
         this.connectedRefUnsubscribe = onValue(connectedRef, (snapshot) => {
@@ -49,10 +96,10 @@ export const PresenceService = {
             // When connected (or reconnected), set up onDisconnect hook
             // This will run on Firebase servers when user disconnects
             onDisconnect(this.userStatusRef)
-                .set(isOfflineStatus)
+                .set(getOfflineStatus())
                 .then(() => {
                     // Now set the user as online
-                    set(this.userStatusRef, isOnlineStatus);
+                    set(this.userStatusRef, getOnlineStatus());
                 });
         });
 
@@ -60,10 +107,29 @@ export const PresenceService = {
         this.startActivityTracker();
 
         // Listen for page visibility changes
-        this.setupVisibilityListener(userId);
+        this.setupVisibilityListener();
 
         // Listen for beforeunload to set offline status
         this.setupBeforeUnloadListener();
+    },
+
+    /**
+     * Helper para obtener datos de timestamp legibles
+     */
+    getTimestampData() {
+        const now = new Date();
+        return {
+            timestamp: serverTimestamp(),
+            readable: now.toLocaleString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            }),
+            iso: now.toISOString()
+        };
     },
 
     /**
@@ -72,11 +138,19 @@ export const PresenceService = {
     startActivityTracker() {
         // Update activity on user interactions
         const updateActivity = () => {
-            if (this.userStatusRef) {
+            if (this.userStatusRef && this.currentUserData) {
                 set(this.userStatusRef, {
+                    // User Info
+                    displayName: this.currentUserData.displayName,
+                    email: this.currentUserData.email,
+                    photoURL: this.currentUserData.photoURL,
+                    uid: this.currentUserData.uid,
+                    // Presence Info
                     isOnline: true,
-                    lastSeen: serverTimestamp(),
-                    lastActive: serverTimestamp()
+                    isAway: false,
+                    // Timestamps
+                    lastSeen: this.getTimestampData(),
+                    lastActive: this.getTimestampData()
                 });
             }
         };
@@ -100,24 +174,34 @@ export const PresenceService = {
     /**
      * Configura listener para cuando la pestaña se oculta/muestra
      */
-    setupVisibilityListener(userId) {
+    setupVisibilityListener() {
         document.addEventListener('visibilitychange', () => {
-            if (!this.userStatusRef) return;
+            if (!this.userStatusRef || !this.currentUserData) return;
 
             if (document.visibilityState === 'hidden') {
                 // User switched tabs or minimized - mark as "away" but still online
                 set(this.userStatusRef, {
+                    displayName: this.currentUserData.displayName,
+                    email: this.currentUserData.email,
+                    photoURL: this.currentUserData.photoURL,
+                    uid: this.currentUserData.uid,
                     isOnline: true,
-                    lastSeen: serverTimestamp(),
-                    isAway: true
+                    isAway: true,
+                    lastSeen: this.getTimestampData(),
+                    awayAt: this.getTimestampData()
                 });
             } else {
                 // User came back
                 set(this.userStatusRef, {
+                    displayName: this.currentUserData.displayName,
+                    email: this.currentUserData.email,
+                    photoURL: this.currentUserData.photoURL,
+                    uid: this.currentUserData.uid,
                     isOnline: true,
-                    lastSeen: serverTimestamp(),
-                    lastActive: serverTimestamp(),
-                    isAway: false
+                    isAway: false,
+                    lastSeen: this.getTimestampData(),
+                    lastActive: this.getTimestampData(),
+                    returnedAt: this.getTimestampData()
                 });
             }
         });
@@ -128,12 +212,18 @@ export const PresenceService = {
      */
     setupBeforeUnloadListener() {
         window.addEventListener('beforeunload', () => {
-            if (this.userStatusRef) {
+            if (this.userStatusRef && this.currentUserData) {
                 // Intentar marcar como offline antes de cerrar
                 // Nota: Esto no siempre funciona, por eso onDisconnect es importante
                 set(this.userStatusRef, {
+                    displayName: this.currentUserData.displayName,
+                    email: this.currentUserData.email,
+                    photoURL: this.currentUserData.photoURL,
+                    uid: this.currentUserData.uid,
                     isOnline: false,
-                    lastSeen: serverTimestamp()
+                    isAway: false,
+                    lastSeen: this.getTimestampData(),
+                    disconnectedAt: this.getTimestampData()
                 });
             }
         });
@@ -225,10 +315,17 @@ export const PresenceService = {
      * Marca al usuario como desconectado (para logout manual)
      */
     async goOffline() {
-        if (this.userStatusRef) {
+        if (this.userStatusRef && this.currentUserData) {
             await set(this.userStatusRef, {
+                displayName: this.currentUserData.displayName,
+                email: this.currentUserData.email,
+                photoURL: this.currentUserData.photoURL,
+                uid: this.currentUserData.uid,
                 isOnline: false,
-                lastSeen: serverTimestamp()
+                isAway: false,
+                lastSeen: this.getTimestampData(),
+                disconnectedAt: this.getTimestampData(),
+                logoutManual: true
             });
         }
     },

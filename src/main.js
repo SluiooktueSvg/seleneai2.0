@@ -41,7 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
             app.classList.remove('hidden');
 
             // Init Presence System (En línea / Última vez)
-            PresenceService.init(finalUser.uid);
+            PresenceService.init(finalUser.uid, {
+                displayName: finalUser.displayName || finalUser.preferredName || 'Usuario',
+                email: finalUser.email || '',
+                photoURL: finalUser.photoURL || ''
+            });
 
             // Init App Components
             const chatController = initChatArea(finalUser);
