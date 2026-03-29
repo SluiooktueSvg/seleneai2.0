@@ -24,10 +24,17 @@
     border-radius: 50%;
     color: var(--text-main);
     margin-bottom: var(--spacing-md);
+    transition: background-color 0.2s ease,
+                transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .menu-btn:hover {
     background-color: var(--hover-color);
+    transform: scale(1.05);
+}
+
+.menu-btn:active {
+    transform: scale(0.95);
 }
 
 .menu-btn svg,
@@ -50,12 +57,20 @@
     border-radius: var(--radius-pill);
     cursor: pointer;
     width: fit-content;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s ease,
+                transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.2s ease;
 }
 
 .new-chat-btn:hover {
     background-color: var(--hover-color);
     color: var(--text-main);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.new-chat-btn:active {
+    transform: translateY(0) scale(0.98);
 }
 
 .recent-chats {
@@ -128,12 +143,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.2s, background-color 0.2s;
+    transition: color 0.2s ease,
+                background-color 0.2s ease,
+                transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .delete-chat-btn:hover {
     color: #ff4d4d;
     background-color: rgba(255, 77, 77, 0.1);
+    transform: scale(1.1);
+}
+
+.delete-chat-btn:active {
+    transform: scale(0.9);
 }
 
 .delete-chat-btn svg {
@@ -141,14 +163,24 @@
     height: 18px;
 }
 
+.chat-item {
+    transition: background-color 0.2s ease,
+                transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .chat-item:hover {
     background-color: var(--hover-color);
+    transform: translateX(4px);
+}
+
+.chat-item:active {
+    transform: translateX(2px) scale(0.99);
 }
 
 .chat-item.active {
     background-color: #004A77;
-    /* Selected state color */
     color: #C2E7FF;
+    transform: translateX(0);
 }
 
 .sidebar-footer {
@@ -167,10 +199,17 @@
     color: var(--text-main);
     cursor: pointer;
     font-size: 14px;
+    transition: background-color 0.2s ease,
+                transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .footer-btn:hover {
     background-color: var(--hover-color);
+    transform: translateX(4px);
+}
+
+.footer-btn:active {
+    transform: translateX(2px) scale(0.98);
 }
 
 @media (max-width: 768px) {
