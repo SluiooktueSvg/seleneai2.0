@@ -112,27 +112,39 @@
     padding: var(--spacing-lg);
 }
 
-/* Staggered animation for settings items */
-.modal-overlay.open .setting-item {
-    animation: slideInFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    opacity: 0;
+/* Base state for modal content - always visible */
+.setting-item,
+.setting-separator,
+.modal-header h2 {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.modal-overlay.open .setting-item:nth-child(1) { animation-delay: 0.15s; }
-.modal-overlay.open .setting-item:nth-child(2) { animation-delay: 0.22s; }
-.modal-overlay.open .setting-item:nth-child(3) { animation-delay: 0.29s; }
-.modal-overlay.open .setting-separator { animation-delay: 0.36s; }
-.modal-overlay.open .setting-item:nth-child(5) { animation-delay: 0.43s; }
-
-.modal-overlay.open .setting-separator {
-    animation: slideInFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    opacity: 0;
-}
-
+/* Animation only on first open - using animation-fill-mode: both */
 .modal-overlay.open .modal-header h2 {
-    animation: slideInFade 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: slideInFade 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
     animation-delay: 0.1s;
-    opacity: 0;
+}
+
+.modal-overlay.open .setting-item:nth-child(1) { 
+    animation: slideInFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+    animation-delay: 0.15s; 
+}
+.modal-overlay.open .setting-item:nth-child(2) { 
+    animation: slideInFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+    animation-delay: 0.22s; 
+}
+.modal-overlay.open .setting-item:nth-child(3) { 
+    animation: slideInFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+    animation-delay: 0.29s; 
+}
+.modal-overlay.open .setting-separator { 
+    animation: slideInFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+    animation-delay: 0.36s; 
+}
+.modal-overlay.open .setting-item:nth-child(5) { 
+    animation: slideInFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+    animation-delay: 0.43s; 
 }
 
 @keyframes slideInFade {

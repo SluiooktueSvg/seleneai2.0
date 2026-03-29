@@ -235,12 +235,15 @@
         width: 280px;
         transform: translateX(-100%);
         z-index: 100;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+        box-shadow: none;
         padding-top: 60px;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                    box-shadow 0.3s ease;
     }
 
     .sidebar.open {
         transform: translateX(0);
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
     }
 
     .sidebar.collapsed {
@@ -440,10 +443,12 @@
     padding: 0;
     border-radius: 50%;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.2s;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    transition: background-color 0.25s ease,
+                transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.25s ease;
 }
 
 .mobile-menu-toggle svg {
@@ -451,14 +456,16 @@
     height: 24px;
     fill: currentColor;
     pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mobile-menu-toggle:hover {
     background-color: var(--hover-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .mobile-menu-toggle:active {
-    transform: scale(0.95);
+    transform: scale(0.9);
     background-color: var(--hover-color);
 }
 
