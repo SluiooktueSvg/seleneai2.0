@@ -1,6 +1,7 @@
 export function initInputArea(onSend) {
   const container = document.createElement('div');
   container.className = 'input-area-container';
+  const cleanupCallbacks = [];
 
   container.innerHTML = `
     <div class="input-box">
@@ -28,17 +29,14 @@ export function initInputArea(onSend) {
     </div>
   `;
 
-  // Auto-resize textarea
   const textarea = container.querySelector('#chat-input');
   const sendBtn = container.querySelector('#send-btn');
   const chipsContainer = container.querySelector('#chips-container');
 
-  // Logic to add a chip
   const addChip = (text, iconSVG) => {
-    // Clear previous chips if we only want one active context at a time (Gemini style usually allows one image/context)
-    // For now, let's append, but easy to undo.
     const chip = document.createElement('div');
     chip.className = 'input-chip';
+    chip.dataset.prompt = text;
     chip.innerHTML = `
       <div class="chip-icon">${iconSVG}</div>
       <span class="chip-text">${text}</span>
@@ -47,11 +45,9 @@ export function initInputArea(onSend) {
       </button>
     `;
 
-    // Remove chip on click
     chip.querySelector('.chip-close').onclick = (e) => {
       e.stopPropagation();
       chip.remove();
-      // Check input state again
       updateSendButton();
     };
 
@@ -60,7 +56,6 @@ export function initInputArea(onSend) {
   };
 
   const updateSendButton = () => {
-    // Enable send if specific text OR chips exist
     const hasChips = chipsContainer.children.length > 0;
     const hasText = textarea.value.trim().length > 0;
 
@@ -73,56 +68,45 @@ export function initInputArea(onSend) {
     }
   };
 
-  textarea.addEventListener('input', () => {
+  const handleInput = () => {
     textarea.style.height = 'auto';
     const maxInputHeight = 140;
     const nextHeight = Math.min(textarea.scrollHeight, maxInputHeight);
-    textarea.style.height = nextHeight + 'px';
+    textarea.style.height = `${nextHeight}px`;
     updateSendButton();
-  });
+  };
+  textarea.addEventListener('input', handleInput);
+  cleanupCallbacks.push(() => textarea.removeEventListener('input', handleInput));
 
-  // Handle Send
   const handleSend = () => {
     const text = textarea.value.trim();
-    // Gather chips info if we wanted to send it separately, 
-    // for now we just send text, but we should make sure chips mimic context.
-    // If chips mimic "appending text", we might want to append them to the text?
-    // The user said "adds to input". 
-    // If it's a chip, it's usually context. 
-    // Let's assume the chip IS part of the message or context.
+    const chipPrompts = Array.from(chipsContainer.children)
+      .map((chip) => chip.dataset.prompt?.trim())
+      .filter(Boolean);
 
-    // For this implementation, if there is a chip, we treat it as valid input to allow sending.
-    const hasChips = chipsContainer.children.length > 0;
-
-    if (text || hasChips) {
-      // Construct message
-      let fullMessage = text;
-
-      // If chips are present, maybe we should prepend them as context text?
-      // Or just send the text and assume the chip was for "show".
-      // Let's just send the text for now, assuming the chip might have PRE-FILLED the text or acts as context.
-      // Wait, user said "select option -> add to input".
-      // In Gemini, "Create image" adds a chip and you type "A cat".
-      // We will send the text. Ideally we'd send metadata about the chip.
-
+    if (text || chipPrompts.length > 0) {
+      const fullMessage = [...chipPrompts, text].filter(Boolean).join('\n');
       onSend(fullMessage);
 
       textarea.value = '';
-      textarea.style.height = 'auto'; // Reset height
-      chipsContainer.innerHTML = ''; // Clear chips logic? Usually yes after send.
+      textarea.style.height = 'auto';
+      chipsContainer.innerHTML = '';
       updateSendButton();
     }
-  }
+  };
 
   sendBtn.addEventListener('click', handleSend);
-  textarea.addEventListener('keydown', (e) => {
+  cleanupCallbacks.push(() => sendBtn.removeEventListener('click', handleSend));
+
+  const handleKeydown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
-  });
+  };
+  textarea.addEventListener('keydown', handleKeydown);
+  cleanupCallbacks.push(() => textarea.removeEventListener('keydown', handleKeydown));
 
-  // Feature Not Available Modal Logic
   const showModal = () => {
     const modal = document.createElement('div');
     modal.className = 'feature-modal-overlay';
@@ -146,8 +130,18 @@ export function initInputArea(onSend) {
     });
   };
 
-  container.querySelector('#upload-btn').addEventListener('click', showModal);
-  container.querySelector('#mic-btn').addEventListener('click', showModal);
+  const uploadBtn = container.querySelector('#upload-btn');
+  const micBtn = container.querySelector('#mic-btn');
+  uploadBtn.addEventListener('click', showModal);
+  micBtn.addEventListener('click', showModal);
+  cleanupCallbacks.push(() => uploadBtn.removeEventListener('click', showModal));
+  cleanupCallbacks.push(() => micBtn.removeEventListener('click', showModal));
 
-  return { element: container, addChip };
+  return {
+    element: container,
+    addChip,
+    destroy: () => {
+      cleanupCallbacks.forEach((callback) => callback());
+    }
+  };
 }

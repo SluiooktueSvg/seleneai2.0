@@ -7,21 +7,16 @@ export function initChatArea(user) {
   let currentChatId = null;
   let messagesUnsubscribe = null;
 
-  // Initialize Chat Session (Always start fresh, but history might be injected if we support it)
-  // For now, simpler implementation: new chats behave as before, 
-  // loading a chat just displays it (maybe read-only or continues context if we fetch history)
   let chatSession;
   try {
     chatSession = GeminiService.startChat();
   } catch (e) {
-    console.error("Failed to start chat session", e);
+    console.error('Failed to start chat session', e);
   }
 
-  // Create Main Scroll Area
   const messagesArea = document.createElement('div');
   messagesArea.className = 'messages-area';
 
-  // Welcome Hero (Initially visible)
   const createWelcomeHero = () => {
     const hero = document.createElement('div');
     const nameToUse = user.preferredName || user.displayName || 'Human';
@@ -67,105 +62,81 @@ export function initChatArea(user) {
   messagesArea.appendChild(welcomeHero);
   chatContainer.appendChild(messagesArea);
 
-  // NEW: Listen for 'load-chat' event from Sidebar
-  document.addEventListener('load-chat', (e) => {
-    const chatId = e.detail.chatId;
-    loadChat(chatId);
-  });
-
-  // Track rendered message IDs to avoid re-rendering
   let renderedMessageIds = new Set();
 
   const loadChat = (chatId) => {
     currentChatId = chatId;
-    // 1. Clear current view
     messagesArea.innerHTML = '';
     renderedMessageIds.clear();
     if (welcomeHero) welcomeHero.remove();
 
-    // 2. Unsubscribe previous listener
     if (messagesUnsubscribe) messagesUnsubscribe();
 
-    // 3. Subscribe to new messages
     messagesUnsubscribe = ChatHistoryService.subscribeToMessages(user.uid, chatId, (messages) => {
-      // Only append NEW messages that haven't been rendered yet
-      messages.forEach(msg => {
+      messages.forEach((msg) => {
         if (!renderedMessageIds.has(msg.id)) {
           renderedMessageIds.add(msg.id);
-          appendMessage(messagesArea, msg.text, msg.role, false); // false = no typing effect for history
+          appendMessage(messagesArea, msg.text, msg.role, false);
         }
       });
 
-      // Scroll to bottom
       messagesArea.scrollTop = messagesArea.scrollHeight;
     });
 
-    // Reset Gemini Context (Optional: We could rebuild history array here)
     chatSession = GeminiService.startChat();
   };
 
-  // Handle new messages
+  const loadChatHandler = (e) => {
+    const chatId = e.detail.chatId;
+    loadChat(chatId);
+  };
+  document.addEventListener('load-chat', loadChatHandler);
+
   const onSend = async (text) => {
-    // Hide welcome hero if first message
     if (welcomeHero && welcomeHero.parentNode) {
       welcomeHero.remove();
     }
 
-    // Generate a temporary ID to track this optimistic message
     const tempUserMsgId = `temp-user-${Date.now()}`;
-    const tempAiMsgId = `temp-ai-${Date.now()}`;
 
-    // 1. Optimistic UI Update (Show immediately)
     appendMessage(messagesArea, text, 'user');
-    // Mark as rendered to prevent duplicate from Firestore listener
     renderedMessageIds.add(tempUserMsgId);
 
-    // 2. Lock the Chat ID for this transaction
-    // If it's a new chat, we'll establish the ID after saving the first message.
     let targetChatId = currentChatId;
-    let isNewChat = !targetChatId;
+    const isNewChat = !targetChatId;
 
     try {
-      // Save User Message
       const result = await ChatHistoryService.saveMessage(user.uid, targetChatId, text, 'user');
       const savedChatId = result.chatId || result;
       const savedMsgId = result.messageId;
-      
-      // Replace temp ID with real ID if available
+
       if (savedMsgId) {
         renderedMessageIds.delete(tempUserMsgId);
         renderedMessageIds.add(savedMsgId);
       }
 
-      // If we started as a new chat, we now have an ID.
       if (!targetChatId) {
         targetChatId = savedChatId;
-        // If the user hasn't switched away yet, update the view state.
         if (!currentChatId) {
           currentChatId = targetChatId;
         }
       }
 
-      // AUTO-TITLING behavior (background)
       if (isNewChat && targetChatId) {
         (async () => {
           const title = await GeminiService.generateTitle(text);
           await ChatHistoryService.updateChatTitle(user.uid, targetChatId, title);
         })();
       }
-
     } catch (dbError) {
-      console.error("Firestore Error (User Msg):", dbError);
+      console.error('Firestore Error (User Msg):', dbError);
     }
 
-    // Show AI loading (Only if still looking at the same chat)
     if (currentChatId === targetChatId) {
       showLoading(messagesArea);
     }
 
     try {
-      // Start a fresh session if needed, but really we should manage sessions per chat ID ideally.
-      // For MVP, we just use a generic session.
       if (!chatSession) {
         chatSession = GeminiService.startChat();
       }
@@ -174,47 +145,37 @@ export function initChatArea(user) {
       const response = await result.response;
       const textResponse = response.text();
 
-      // Remove loading (Only if still looking at the same chat)
       if (currentChatId === targetChatId) {
         removeLoading(messagesArea);
       }
 
-      // 3. Save AI Message to DB 
-      // CRITICAL: We save to targetChatId, regardless of where the user is looking now.
       const aiResult = await ChatHistoryService.saveMessage(user.uid, targetChatId, textResponse, 'ai');
-      
-      // Track AI message ID to prevent duplicate from Firestore listener
+
       if (aiResult.messageId) {
         renderedMessageIds.add(aiResult.messageId);
       }
 
-      // 4. Render (Only if still looking at the same chat)
       if (currentChatId === targetChatId) {
         appendMessage(messagesArea, textResponse, 'ai');
       }
-
     } catch (error) {
-      console.error("Gemini Error:", error);
+      console.error('Gemini Error:', error);
       if (currentChatId === targetChatId) {
         removeLoading(messagesArea);
-        appendMessage(messagesArea, "Error de conexión o API Key inválida.", 'ai');
+        appendMessage(messagesArea, 'Error de conexión o API Key inválida.', 'ai');
       }
     }
   };
 
-  // Initialize Input Area
-  const { element: inputElement, addChip } = initInputArea(onSend);
+  const { element: inputElement, addChip, destroy: destroyInput } = initInputArea(onSend);
   chatContainer.appendChild(inputElement);
 
-  // Suggested Actions Click Handler (Moved here to access addChip)
   const attachSuggestionListeners = () => {
     const cards = messagesArea.querySelectorAll('.suggestion-card');
-    cards.forEach(card => {
+    cards.forEach((card) => {
       card.addEventListener('click', () => {
         const text = card.querySelector('p').innerText;
-        const icon = card.querySelector('.icon-box').innerHTML; // Get SVG
-
-        // Add as chip instead of text
+        const icon = card.querySelector('.icon-box').innerHTML;
         addChip(text, icon);
 
         const input = document.getElementById('chat-input');
@@ -224,24 +185,32 @@ export function initChatArea(user) {
   };
   attachSuggestionListeners();
 
-  // Return control methods
   return {
     reset: () => {
-      // Clear all messages
       messagesArea.innerHTML = '';
       currentChatId = null;
       renderedMessageIds.clear();
-      if (messagesUnsubscribe) messagesUnsubscribe();
+      if (messagesUnsubscribe) {
+        messagesUnsubscribe();
+        messagesUnsubscribe = null;
+      }
 
-      // Re-create and append hero
       welcomeHero = createWelcomeHero();
       messagesArea.appendChild(welcomeHero);
-      // Reset Chat Session
+      attachSuggestionListeners();
       chatSession = GeminiService.startChat();
 
-      // Clear sidebar selection
       const all = document.querySelectorAll('.chat-item');
-      all.forEach(x => x.classList.remove('active'));
+      all.forEach((x) => x.classList.remove('active'));
+    },
+    destroy: () => {
+      if (messagesUnsubscribe) {
+        messagesUnsubscribe();
+        messagesUnsubscribe = null;
+      }
+      document.removeEventListener('load-chat', loadChatHandler);
+      destroyInput?.();
+      chatContainer.innerHTML = '';
     }
   };
 }
@@ -271,7 +240,6 @@ function appendMessage(container, text, role, animate = true) {
     textContainer.textContent = text;
   }
 
-  // Scroll to bottom
   container.scrollTop = container.scrollHeight;
 }
 
@@ -297,9 +265,7 @@ function removeLoading(container) {
   if (loader) loader.remove();
 }
 
-// Helper to simulate typewriter effect
 function typeText(element, text, speed = 20) {
-  // Check global settings
   if (window.SELENE_SETTINGS && window.SELENE_SETTINGS.typingSpeed) {
     speed = window.SELENE_SETTINGS.typingSpeed;
   }
@@ -309,7 +275,6 @@ function typeText(element, text, speed = 20) {
     if (i < text.length) {
       element.innerHTML += text.charAt(i);
       i++;
-      // Scroll to bottom as we type
       const container = element.closest('.messages-area');
       if (container) {
         container.scrollTop = container.scrollHeight;

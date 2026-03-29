@@ -1,140 +1,135 @@
 import './style.css';
-import './styles/sidebar.css';
-import './styles/chat.css';
-
-import './styles/settings.css';
-import './styles/theme-settings.css';
-import './styles/confirm-modal.css';
 import './styles/login.css';
+import './styles/onboarding.css';
+import './styles/chat.css';
+import './styles/sidebar.css';
 
+// Componentes de la App
 import { initSidebar } from './components/Sidebar';
 import { initChatArea } from './components/ChatArea';
 import { initSettingsModal } from './components/SettingsModal';
-import { initLoginScreen } from './components/LoginScreen';
 import { AuthService } from './services/auth';
 import { UserService } from './services/user';
 import { initOnboarding } from './components/Onboarding';
-
 import { ConfirmModal } from './components/ConfirmModal';
 import { ChatHistoryService } from './services/history';
 import { initAFKMode } from './components/AFKMode';
 import { PresenceService } from './services/presence';
 
-// Initialize components
-document.addEventListener('DOMContentLoaded', () => {
-    const app = document.getElementById('app');
+// Componentes de la LANDING
+import { Router } from './landing_comp/router.js';
+import { HomePage, FeaturesPage, PrivacyPage, TermsPage, ContactPage } from './landing_comp/pages.js';
 
-    // Initially hide app
-    app.classList.add('hidden');
+document.addEventListener('DOMContentLoaded', () => {
+    let activeAppCleanup = null;
+
+    const routes = {
+        '/': HomePage,
+        '/features': FeaturesPage,
+        '/privacy': PrivacyPage,
+        '/terms': TermsPage,
+        '/contact': ContactPage,
+    };
+
+    const landingRouter = new Router(routes);
+    landingRouter.setLoginHandler(() => AuthService.loginWithGoogle());
+
+    const cleanupActiveApp = () => {
+        if (activeAppCleanup) {
+            activeAppCleanup();
+            activeAppCleanup = null;
+        }
+    };
+
+    const proceedToApp = (finalUser) => {
+        cleanupActiveApp();
+
+        document.body.classList.remove('landing-active');
+        const landingElements = document.querySelectorAll('header, footer, main, .login-container');
+        landingElements.forEach((el) => el.remove());
+
+        const app = document.getElementById('app');
+        app.classList.remove('hidden');
+        app.innerHTML = `
+            <div class="main-layout app-active">
+                <aside id="sidebar" class="sidebar"></aside>
+                <main id="chat-container" class="chat-container"></main>
+            </div>
+        `;
+
+        setTimeout(() => {
+            try {
+                PresenceService.init(finalUser.uid, {
+                    displayName: finalUser.displayName || finalUser.preferredName || 'Usuario',
+                    email: finalUser.email || '',
+                    photoURL: finalUser.photoURL || ''
+                });
+
+                const chatController = initChatArea(finalUser);
+                const settingsModal = initSettingsModal(() => AuthService.logout());
+                const confirmModal = new ConfirmModal();
+                initAFKMode();
+
+                const sidebarController = initSidebar(
+                    () => chatController.reset(),
+                    () => settingsModal.open(),
+                    finalUser,
+                    async (chatId) => {
+                        confirmModal.open(async () => {
+                            try {
+                                await ChatHistoryService.deleteChat(finalUser.uid, chatId);
+                                chatController.reset();
+                            } catch (err) {
+                                console.error(err);
+                            }
+                        });
+                    }
+                );
+
+                activeAppCleanup = () => {
+                    chatController?.destroy?.();
+                    sidebarController?.destroy?.();
+                };
+            } catch (error) {
+                console.error('Error critico al arrancar Elai:', error);
+            }
+        }, 50);
+    };
 
     const onLoginSuccess = async (user) => {
-        // Remove login screen
-        const loginScreen = document.querySelector('.login-container');
-        if (loginScreen) loginScreen.remove();
-
-        // Check Onboarding
-        let currentUser = user;
         const profile = await UserService.getUserProfile(user.uid);
 
-        const proceedToApp = (finalUser) => {
-            // Show App
-            app.classList.remove('hidden');
-
-            console.log('[v0] proceedToApp - finalUser:', finalUser);
-
-            // Init Presence System (En línea / Última vez)
-            const presenceData = {
-                displayName: finalUser.displayName || finalUser.preferredName || 'Usuario',
-                email: finalUser.email || '',
-                photoURL: finalUser.photoURL || ''
-            };
-            console.log('[v0] Presence data being sent:', presenceData);
-            PresenceService.init(finalUser.uid, presenceData);
-
-            // Init App Components
-            const chatController = initChatArea(finalUser);
-            const settingsModal = initSettingsModal(AuthService.logout);
-            const confirmModal = new ConfirmModal();
-
-            // Init AFK Mode
-            initAFKMode();
-
-            initSidebar(
-                () => chatController.reset(),
-                () => settingsModal.open(),
-                finalUser,
-                (chatId) => {
-                    confirmModal.open(async () => {
-                        // Optimistic Interaction:
-                        // 1. UI: Remove immediately from sidebar using DOM
-                        const chatEl = document.querySelector(`.chat-item[data-id="${chatId}"]`);
-                        if (chatEl) {
-                            chatEl.style.height = '0px';
-                            chatEl.style.opacity = '0';
-                            chatEl.style.margin = '0';
-                            chatEl.style.padding = '0';
-                            setTimeout(() => chatEl.remove(), 300); // Remove after animation
-                        }
-
-                        // 2. Logic: Reset current view if it was the deleted one
-                        // We check this BEFORE calling delete to avoid weird race conditions
-                        // (Implementation detail: Sidebar usually handles selection state, 
-                        // but we might want to reset the main area immediately if open)
-                        // For now, let's just trigger server delete.
-
-                        // Background Server Delete
-                        try {
-                            await ChatHistoryService.deleteChat(finalUser.uid, chatId);
-                            // If success, Sidebar listener will eventually sync, 
-                            // but we already removed it so user feels it's instant.
-                            chatController.reset(); // Reset chat area to welcome screen
-                        } catch (err) {
-                            console.error("Delete failed, should revert UI here technically but keeping simple", err);
-                            // Ideally we would show a toast error here
-                        }
-                    });
-                }
-            );
-
-            console.log('Selene Clone Initialized for', finalUser.displayName);
-        };
-
-        // FORCE ONBOARDING FOR TESTING: Added '|| true'??  CAMBIO DE PRUUEBAS...... DE ONBOARDING DE PRUUEBAS 
         if (!profile || !profile.onboardingComplete) {
+            const app = document.getElementById('app');
+            app.innerHTML = '';
+            app.classList.add('hidden');
 
-            // CAMBIAR AQUI PRUEBAS DE ONBOARDING.....
-
-
-            // New User or Incomplete Onboarding
-            await UserService.createUserProfile(user); // Ensure doc exists
+            await UserService.createUserProfile(user);
             const onboardingScreen = initOnboarding(user, (updatedUser) => {
                 proceedToApp(updatedUser);
             });
             document.body.appendChild(onboardingScreen);
         } else {
-            // Existing User - merge preferredName
-            currentUser = { ...user, preferredName: profile.preferredName };
-            proceedToApp(currentUser);
+            proceedToApp({ ...user, preferredName: profile.preferredName });
         }
     };
 
-    // Check auth status
     AuthService.onUserChange(async (user) => {
-        if (user) {
-            onLoginSuccess(user);
-        } else {
-            // Logout / No Session - cleanup presence first
-            await PresenceService.cleanup();
-            
-            app.classList.add('hidden');
+        const app = document.getElementById('app');
 
-            // Re-show Login Screen if not present
-            if (!document.querySelector('.login-container')) {
-                const loginScreen = initLoginScreen(AuthService.loginWithGoogle);
-                document.body.appendChild(loginScreen);
-            }
+        if (user) {
+            await onLoginSuccess(user);
+        } else {
+            cleanupActiveApp();
+
+            const onboarding = document.querySelector('.onboarding-screen');
+            if (onboarding) onboarding.remove();
+
+            app.classList.add('hidden');
+            document.body.classList.add('landing-active');
+
+            landingRouter.init();
+            PresenceService.cleanup().catch(() => { });
         }
     });
 });
-
-import './styles/onboarding.css';

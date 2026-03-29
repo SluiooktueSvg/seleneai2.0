@@ -1,21 +1,18 @@
 import { ChatHistoryService } from '../services/history';
 
-// Mobile menu state management
 let mobileMenuInitialized = false;
 let closeSidebarFn = null;
+let chatListUnsubscribe = null;
 
 export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
   const sidebar = document.getElementById('sidebar');
 
-  // Default values or user data
   const photoURL = user?.photoURL || 'https://via.placeholder.com/32';
   const email = user?.email || 'usuario@example.com';
 
-  // Mobile Toggle Logic - initialize only once
   if (!mobileMenuInitialized) {
     mobileMenuInitialized = true;
-    
-    // Remove existing elements if any (for hot reload)
+
     const existingBtn = document.getElementById('mobile-menu-toggle');
     const existingBackdrop = document.getElementById('sidebar-backdrop');
     if (existingBtn) existingBtn.remove();
@@ -29,41 +26,44 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
     mobileBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg>';
     document.body.appendChild(mobileBtn);
 
-    // Create backdrop for mobile
     const backdrop = document.createElement('div');
     backdrop.id = 'sidebar-backdrop';
     backdrop.className = 'sidebar-backdrop';
     document.body.appendChild(backdrop);
 
     const closeSidebar = () => {
-      if (!sidebar) return;
-      sidebar.classList.remove('open');
+      const currentSidebar = document.getElementById('sidebar');
+      if (!currentSidebar) return;
+      currentSidebar.classList.remove('open');
       backdrop.classList.remove('active');
       mobileBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg>';
       mobileBtn.setAttribute('aria-label', 'Abrir menú');
     };
 
-    closeSidebarFn = closeSidebar;
-
     const openSidebar = () => {
-      if (!sidebar) return;
-      sidebar.classList.add('open');
+      const currentSidebar = document.getElementById('sidebar');
+      if (!currentSidebar) return;
+      currentSidebar.classList.add('open');
       backdrop.classList.add('active');
       mobileBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>';
       mobileBtn.setAttribute('aria-label', 'Cerrar menú');
     };
 
+    closeSidebarFn = closeSidebar;
+
     mobileBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      if (sidebar.classList.contains('open')) {
+      const currentSidebar = document.getElementById('sidebar');
+      if (!currentSidebar) return;
+
+      if (currentSidebar.classList.contains('open')) {
         closeSidebar();
       } else {
         openSidebar();
       }
     });
 
-    // Close sidebar when clicking backdrop
     backdrop.addEventListener('click', (e) => {
       e.preventDefault();
       closeSidebar();
@@ -116,17 +116,15 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
     </div>
   `;
 
-  // --- Logic ---
   const menuBtn = sidebar.querySelector('.menu-btn');
   const settingsBtn = sidebar.querySelector('#settings-btn');
   const newChatBtn = sidebar.querySelector('#new-chat-btn');
   const chatListContainer = sidebar.querySelector('#chat-list-container');
 
-  // Activar el anuncio de Google
   try {
     (window.adsbygoogle = window.adsbygoogle || []).push({});
   } catch (e) {
-    console.error("AdSense push error:", e);
+    console.error('AdSense push error:', e);
   }
 
   menuBtn.addEventListener('click', () => {
@@ -135,12 +133,11 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
 
   newChatBtn.addEventListener('click', () => {
     const items = sidebar.querySelectorAll('.chat-item');
-    items.forEach(i => i.classList.remove('active'));
-    // Close sidebar on mobile after action
+    items.forEach((i) => i.classList.remove('active'));
     if (window.innerWidth <= 768 && closeSidebarFn) {
       closeSidebarFn();
     }
-    onNewChat(); 
+    onNewChat();
   });
 
   if (settingsBtn) {
@@ -149,10 +146,13 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
     });
   }
 
-  // Real Chat History Subscription
   if (user && user.uid) {
-    ChatHistoryService.subscribeToChatList(user.uid, (chats) => {
-      chatListContainer.innerHTML = ''; 
+    if (chatListUnsubscribe) {
+      chatListUnsubscribe();
+    }
+
+    chatListUnsubscribe = ChatHistoryService.subscribeToChatList(user.uid, (chats) => {
+      chatListContainer.innerHTML = '';
 
       if (chats.length === 0) {
         chatListContainer.innerHTML = '<div style="padding:10px; font-size:12px; color:#888" class="collapsed-hide">No hay chats recientes</div>';
@@ -162,28 +162,27 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
       chats.forEach((chat, index) => {
         const btn = document.createElement('button');
         btn.className = 'chat-item';
-        btn.dataset.id = chat.id; 
+        btn.dataset.id = chat.id;
         btn.style.animationDelay = `${index * 0.05}s`;
 
         btn.innerHTML = `
-                  <div class="chat-info-row">
-                      <svg viewBox="0 0 24 24" class="chat-icon"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"></path></svg>
-                      <span class="chat-title collapsed-hide">${chat.title}</span>
-                  </div>
-                  <div class="chat-actions collapsed-hide">
-                      <button class="delete-chat-btn" title="Eliminar conversación">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                      </button>
-                  </div>
-              `;
+          <div class="chat-info-row">
+              <svg viewBox="0 0 24 24" class="chat-icon"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"></path></svg>
+              <span class="chat-title collapsed-hide">${chat.title}</span>
+          </div>
+          <div class="chat-actions collapsed-hide">
+              <button class="delete-chat-btn" title="Eliminar conversación">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+              </button>
+          </div>
+        `;
 
         btn.addEventListener('click', (e) => {
           if (e.target.closest('.delete-chat-btn')) return;
           const all = sidebar.querySelectorAll('.chat-item');
-          all.forEach(x => x.classList.remove('active'));
+          all.forEach((x) => x.classList.remove('active'));
           btn.classList.add('active');
 
-          // Close sidebar on mobile after selecting a chat
           if (window.innerWidth <= 768 && closeSidebarFn) {
             closeSidebarFn();
           }
@@ -204,4 +203,13 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
       });
     });
   }
+
+  return {
+    destroy: () => {
+      if (chatListUnsubscribe) {
+        chatListUnsubscribe();
+        chatListUnsubscribe = null;
+      }
+    }
+  };
 }

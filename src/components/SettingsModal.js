@@ -1,3 +1,5 @@
+import '../styles/settings.css';
+
 export function initSettingsModal(onLogout) {
   // Create modal container
   const modalOverlay = document.createElement('div');
