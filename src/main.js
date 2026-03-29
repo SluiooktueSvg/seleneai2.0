@@ -18,6 +18,7 @@ import { initOnboarding } from './components/Onboarding';
 import { ConfirmModal } from './components/ConfirmModal';
 import { ChatHistoryService } from './services/history';
 import { initAFKMode } from './components/AFKMode';
+import { PresenceService } from './services/presence';
 
 // Initialize components
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,6 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const proceedToApp = (finalUser) => {
             // Show App
             app.classList.remove('hidden');
+
+            // Init Presence System (En línea / Última vez)
+            PresenceService.init(finalUser.uid);
 
             // Init App Components
             const chatController = initChatArea(finalUser);
@@ -107,11 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Check auth status
-    AuthService.onUserChange((user) => {
+    AuthService.onUserChange(async (user) => {
         if (user) {
             onLoginSuccess(user);
         } else {
-            // Logout / No Session
+            // Logout / No Session - cleanup presence first
+            await PresenceService.cleanup();
+            
             app.classList.add('hidden');
 
             // Re-show Login Screen if not present
