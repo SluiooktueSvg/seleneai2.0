@@ -73,10 +73,14 @@ export function initChatArea(user) {
     loadChat(chatId);
   });
 
+  // Track rendered message IDs to avoid re-rendering
+  let renderedMessageIds = new Set();
+
   const loadChat = (chatId) => {
     currentChatId = chatId;
     // 1. Clear current view
     messagesArea.innerHTML = '';
+    renderedMessageIds.clear();
     if (welcomeHero) welcomeHero.remove();
 
     // 2. Unsubscribe previous listener
@@ -84,12 +88,12 @@ export function initChatArea(user) {
 
     // 3. Subscribe to new messages
     messagesUnsubscribe = ChatHistoryService.subscribeToMessages(user.uid, chatId, (messages) => {
-      messagesArea.innerHTML = ''; // Re-render for simplicity or we could append smart
-      // BUT: Firestore snapshot returns ALL messages. 
-      // Optimization: Ideally we just append new ones, but for MPV full re-render is safer to ensure order.
-
+      // Only append NEW messages that haven't been rendered yet
       messages.forEach(msg => {
-        appendMessage(messagesArea, msg.text, msg.role, false); // false = no typing effect for history
+        if (!renderedMessageIds.has(msg.id)) {
+          renderedMessageIds.add(msg.id);
+          appendMessage(messagesArea, msg.text, msg.role, false); // false = no typing effect for history
+        }
       });
 
       // Scroll to bottom
@@ -107,8 +111,14 @@ export function initChatArea(user) {
       welcomeHero.remove();
     }
 
+    // Generate a temporary ID to track this optimistic message
+    const tempUserMsgId = `temp-user-${Date.now()}`;
+    const tempAiMsgId = `temp-ai-${Date.now()}`;
+
     // 1. Optimistic UI Update (Show immediately)
     appendMessage(messagesArea, text, 'user');
+    // Mark as rendered to prevent duplicate from Firestore listener
+    renderedMessageIds.add(tempUserMsgId);
 
     // 2. Lock the Chat ID for this transaction
     // If it's a new chat, we'll establish the ID after saving the first message.
@@ -117,7 +127,15 @@ export function initChatArea(user) {
 
     try {
       // Save User Message
-      const savedChatId = await ChatHistoryService.saveMessage(user.uid, targetChatId, text, 'user');
+      const result = await ChatHistoryService.saveMessage(user.uid, targetChatId, text, 'user');
+      const savedChatId = result.chatId || result;
+      const savedMsgId = result.messageId;
+      
+      // Replace temp ID with real ID if available
+      if (savedMsgId) {
+        renderedMessageIds.delete(tempUserMsgId);
+        renderedMessageIds.add(savedMsgId);
+      }
 
       // If we started as a new chat, we now have an ID.
       if (!targetChatId) {
@@ -163,7 +181,12 @@ export function initChatArea(user) {
 
       // 3. Save AI Message to DB 
       // CRITICAL: We save to targetChatId, regardless of where the user is looking now.
-      await ChatHistoryService.saveMessage(user.uid, targetChatId, textResponse, 'ai');
+      const aiResult = await ChatHistoryService.saveMessage(user.uid, targetChatId, textResponse, 'ai');
+      
+      // Track AI message ID to prevent duplicate from Firestore listener
+      if (aiResult.messageId) {
+        renderedMessageIds.add(aiResult.messageId);
+      }
 
       // 4. Render (Only if still looking at the same chat)
       if (currentChatId === targetChatId) {
@@ -207,6 +230,7 @@ export function initChatArea(user) {
       // Clear all messages
       messagesArea.innerHTML = '';
       currentChatId = null;
+      renderedMessageIds.clear();
       if (messagesUnsubscribe) messagesUnsubscribe();
 
       // Re-create and append hero

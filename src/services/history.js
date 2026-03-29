@@ -39,13 +39,13 @@ export const ChatHistoryService = {
 
         // Add message to subcollection
         const messagesRef = collection(db, 'users', userId, 'chats', currentChatId, 'messages');
-        await addDoc(messagesRef, {
+        const messageDoc = await addDoc(messagesRef, {
             text: message,
             role: role,
             timestamp: serverTimestamp()
         });
 
-        return currentChatId;
+        return { chatId: currentChatId, messageId: messageDoc.id };
     },
 
     // Listen to user's chat list
