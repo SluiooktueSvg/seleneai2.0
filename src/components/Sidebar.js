@@ -1,5 +1,9 @@
 import { ChatHistoryService } from '../services/history';
 
+// Mobile menu state management
+let mobileMenuInitialized = false;
+let closeSidebarFn = null;
+
 export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
   const sidebar = document.getElementById('sidebar');
 
@@ -7,27 +11,62 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
   const photoURL = user?.photoURL || 'https://via.placeholder.com/32';
   const email = user?.email || 'usuario@example.com';
 
-  // Mobile Toggle Logic
-  if (!document.getElementById('mobile-menu-toggle')) {
+  // Mobile Toggle Logic - initialize only once
+  if (!mobileMenuInitialized) {
+    mobileMenuInitialized = true;
+    
+    // Remove existing elements if any (for hot reload)
+    const existingBtn = document.getElementById('mobile-menu-toggle');
+    const existingBackdrop = document.getElementById('sidebar-backdrop');
+    if (existingBtn) existingBtn.remove();
+    if (existingBackdrop) existingBackdrop.remove();
+
     const mobileBtn = document.createElement('button');
     mobileBtn.id = 'mobile-menu-toggle';
     mobileBtn.className = 'mobile-menu-toggle';
-    mobileBtn.innerHTML = '<svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg>';
+    mobileBtn.setAttribute('aria-label', 'Abrir menú');
+    mobileBtn.setAttribute('type', 'button');
+    mobileBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg>';
     document.body.appendChild(mobileBtn);
 
-    mobileBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
+    // Create backdrop for mobile
+    const backdrop = document.createElement('div');
+    backdrop.id = 'sidebar-backdrop';
+    backdrop.className = 'sidebar-backdrop';
+    document.body.appendChild(backdrop);
+
+    const closeSidebar = () => {
+      if (!sidebar) return;
+      sidebar.classList.remove('open');
+      backdrop.classList.remove('active');
+      mobileBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg>';
+      mobileBtn.setAttribute('aria-label', 'Abrir menú');
+    };
+
+    closeSidebarFn = closeSidebar;
+
+    const openSidebar = () => {
+      if (!sidebar) return;
+      sidebar.classList.add('open');
+      backdrop.classList.add('active');
+      mobileBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>';
+      mobileBtn.setAttribute('aria-label', 'Cerrar menú');
+    };
+
+    mobileBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (sidebar.classList.contains('open')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
     });
 
-    // Close sidebar when clicking outside on mobile
-    document.addEventListener('click', (e) => {
-      if (window.innerWidth <= 768 &&
-        sidebar.classList.contains('open') &&
-        !sidebar.contains(e.target) &&
-        e.target !== mobileBtn &&
-        !mobileBtn.contains(e.target)) {
-        sidebar.classList.remove('open');
-      }
+    // Close sidebar when clicking backdrop
+    backdrop.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeSidebar();
     });
   }
 
@@ -97,6 +136,10 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
   newChatBtn.addEventListener('click', () => {
     const items = sidebar.querySelectorAll('.chat-item');
     items.forEach(i => i.classList.remove('active'));
+    // Close sidebar on mobile after action
+    if (window.innerWidth <= 768 && closeSidebarFn) {
+      closeSidebarFn();
+    }
     onNewChat(); 
   });
 
@@ -139,6 +182,11 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
           const all = sidebar.querySelectorAll('.chat-item');
           all.forEach(x => x.classList.remove('active'));
           btn.classList.add('active');
+
+          // Close sidebar on mobile after selecting a chat
+          if (window.innerWidth <= 768 && closeSidebarFn) {
+            closeSidebarFn();
+          }
 
           const event = new CustomEvent('load-chat', { detail: { chatId: chat.id } });
           document.dispatchEvent(event);

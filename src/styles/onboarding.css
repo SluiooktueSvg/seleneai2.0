@@ -152,3 +152,69 @@
     opacity: 0;
     transition: opacity 0.5s ease;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .onboarding-container {
+        padding: 20px;
+        height: 100vh;
+        height: 100dvh;
+    }
+
+    .onboarding-content {
+        max-width: 100%;
+        padding: 24px;
+    }
+
+    .onboarding-content h1 {
+        font-size: 2rem;
+        line-height: 1.2;
+        margin-bottom: 12px;
+    }
+
+    .onboarding-desc {
+        font-size: 1rem;
+        margin-bottom: 32px;
+    }
+
+    .step-indicator {
+        font-size: 0.8rem;
+        margin-bottom: 16px;
+    }
+
+    .input-group {
+        margin-bottom: 32px;
+    }
+
+    .input-group label {
+        font-size: 1rem;
+        margin-bottom: 12px;
+    }
+
+    .input-group input {
+        font-size: 1.5rem;
+        padding: 8px 0;
+    }
+
+    .input-hint {
+        font-size: 0.85rem;
+    }
+
+    .primary-btn {
+        padding: 14px 28px;
+        font-size: 1rem;
+        width: 100%;
+        float: none;
+    }
+
+    .usage-options {
+        gap: 10px;
+    }
+
+    .usage-btn {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+        flex: 1 1 calc(50% - 5px);
+        text-align: center;
+    }
+}

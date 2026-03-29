@@ -67,18 +67,43 @@ export function initSettingsModal(onLogout) {
   document.body.appendChild(modalOverlay);
 
   // Logic
+  const modal = modalOverlay.querySelector('.modal');
   const closeBtn = modalOverlay.querySelector('.close-btn');
   const fontSizeSelect = modalOverlay.querySelector('#font-size-select');
   const speedSelect = modalOverlay.querySelector('#speed-select');
   const animationsToggle = modalOverlay.querySelector('#animations-toggle');
   const logoutBtn = modalOverlay.querySelector('#logout-btn');
 
-  const closeModal = () => modalOverlay.classList.add('hidden');
-  const openModal = () => modalOverlay.classList.remove('hidden');
+  const closeModal = () => {
+    modalOverlay.classList.remove('open');
+    modal.classList.remove('open');
+    modalOverlay.classList.add('closing');
+    modal.classList.add('closing');
+    setTimeout(() => {
+      modalOverlay.classList.add('hidden');
+      modalOverlay.classList.remove('closing');
+      modal.classList.remove('closing');
+    }, 300);
+  };
+
+  const openModal = () => {
+    modalOverlay.classList.remove('hidden');
+    // Force reflow to trigger animation
+    void modalOverlay.offsetWidth;
+    modalOverlay.classList.add('open');
+    modal.classList.add('open');
+  };
 
   closeBtn.addEventListener('click', closeModal);
   modalOverlay.addEventListener('click', (e) => {
     if (e.target === modalOverlay) closeModal();
+  });
+  
+  // Close with Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modalOverlay.classList.contains('hidden')) {
+      closeModal();
+    }
   });
 
   logoutBtn.addEventListener('click', () => {
