@@ -1297,16 +1297,20 @@ animation: float 3s ease-in-out infinite;
     }
 
     .greeting .gradient-text {
+        background: linear-gradient(to right, #4285F4, #9B72CB, #D96570);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         font-size: 28px;
         display: inline;
     }
 
     .greeting .sub-text {
-        color: #e3e3e3;
+        color: #9aa0a6;
         font-size: 28px;
         display: block;
         margin-top: 6px;
-        opacity: 0.9;
+        -webkit-text-fill-color: #9aa0a6;
     }
 
     /* --- Recuadros de Sugerencias (Cards) --- */
