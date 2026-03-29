@@ -25,11 +25,13 @@ export const PresenceService = {
 
         // Store user data for later updates
         this.currentUserData = {
-            odisplayName: userData.displayName || 'Usuario',
+            displayName: userData.displayName || 'Usuario',
             email: userData.email || '',
             photoURL: userData.photoURL || '',
             uid: userId
         };
+        
+        console.log('[v0] PresenceService.init - userData:', this.currentUserData);
 
         // Reference to this user's status node
         this.userStatusRef = ref(rtdb, `/status/${userId}`);
