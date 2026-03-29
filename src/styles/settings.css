@@ -196,3 +196,59 @@ body.no-animations * {
     height: 20px;
     stroke-width: 2px;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .modal-overlay {
+        padding: 16px;
+        align-items: flex-end;
+    }
+
+    .modal {
+        max-width: 100%;
+        width: 100%;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        padding: var(--spacing-md);
+        position: sticky;
+        top: 0;
+        background-color: var(--sidebar-bg);
+        z-index: 1;
+    }
+
+    .modal-header h2 {
+        font-size: 18px;
+    }
+
+    .modal-content {
+        padding: var(--spacing-md);
+    }
+
+    .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .setting-label {
+        width: 100%;
+    }
+
+    .setting-control {
+        width: 100%;
+    }
+
+    .setting-control select {
+        width: 100%;
+        padding: 12px;
+    }
+
+    .logout-btn {
+        padding: 14px;
+    }
+}

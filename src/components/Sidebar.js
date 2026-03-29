@@ -12,12 +12,43 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
     const mobileBtn = document.createElement('button');
     mobileBtn.id = 'mobile-menu-toggle';
     mobileBtn.className = 'mobile-menu-toggle';
+    mobileBtn.setAttribute('aria-label', 'Abrir menú');
     mobileBtn.innerHTML = '<svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg>';
     document.body.appendChild(mobileBtn);
 
+    // Create backdrop for mobile
+    let backdrop = document.getElementById('sidebar-backdrop');
+    if (!backdrop) {
+      backdrop = document.createElement('div');
+      backdrop.id = 'sidebar-backdrop';
+      backdrop.className = 'sidebar-backdrop';
+      document.body.appendChild(backdrop);
+    }
+
+    const closeSidebar = () => {
+      sidebar.classList.remove('open');
+      backdrop.classList.remove('active');
+      mobileBtn.innerHTML = '<svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg>';
+      mobileBtn.setAttribute('aria-label', 'Abrir menú');
+    };
+
+    const openSidebar = () => {
+      sidebar.classList.add('open');
+      backdrop.classList.add('active');
+      mobileBtn.innerHTML = '<svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>';
+      mobileBtn.setAttribute('aria-label', 'Cerrar menú');
+    };
+
     mobileBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
+      if (sidebar.classList.contains('open')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
     });
+
+    // Close sidebar when clicking backdrop
+    backdrop.addEventListener('click', closeSidebar);
 
     // Close sidebar when clicking outside on mobile
     document.addEventListener('click', (e) => {
@@ -25,8 +56,9 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
         sidebar.classList.contains('open') &&
         !sidebar.contains(e.target) &&
         e.target !== mobileBtn &&
-        !mobileBtn.contains(e.target)) {
-        sidebar.classList.remove('open');
+        !mobileBtn.contains(e.target) &&
+        e.target !== backdrop) {
+        closeSidebar();
       }
     });
   }
