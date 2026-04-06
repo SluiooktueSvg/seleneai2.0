@@ -1,4 +1,5 @@
 import { ChatHistoryService } from '../services/history';
+import { CONSENT_EVENT, getStoredCookieConsent } from './CookieConsent';
 
 let mobileMenuInitialized = false;
 let closeSidebarFn = null;
@@ -6,6 +7,7 @@ let chatListUnsubscribe = null;
 
 export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
   const sidebar = document.getElementById('sidebar');
+  let consentListener = null;
 
   const photoURL = user?.photoURL || 'https://via.placeholder.com/32';
   const email = user?.email || 'usuario@example.com';
@@ -103,6 +105,9 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
       </button>
 
       <div class="ad-sidebar-wrapper collapsed-hide" style="display: flex; justify-content: center; padding: 10px 0; overflow: hidden;">
+        <div class="ad-status-note" id="ad-status-note" style="font-size: 11px; color: #9aa0a6; text-align: center; padding: 0 12px 8px;">
+          Los anuncios se activan despues de tu eleccion de privacidad.
+        </div>
         <ins class="adsbygoogle"
              style="display:inline-block;width:250px;height:50px"
              data-ad-client="ca-pub-1784417792538018"
@@ -121,11 +126,34 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
   const newChatBtn = sidebar.querySelector('#new-chat-btn');
   const chatListContainer = sidebar.querySelector('#chat-list-container');
 
-  try {
-    (window.adsbygoogle = window.adsbygoogle || []).push({});
-  } catch (e) {
-    console.error('AdSense push error:', e);
-  }
+  const adWrapper = sidebar.querySelector('.ad-sidebar-wrapper');
+  const adSlot = sidebar.querySelector('.adsbygoogle');
+  const adStatusNote = sidebar.querySelector('#ad-status-note');
+
+  const tryInitAd = () => {
+    const consent = getStoredCookieConsent();
+    if (!adWrapper || !adSlot || !consent || adSlot.dataset.adInitialized === 'true') {
+      return;
+    }
+
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      adSlot.dataset.adInitialized = 'true';
+      if (adStatusNote) adStatusNote.style.display = 'none';
+    } catch (e) {
+      console.error('AdSense push error:', e);
+      if (adStatusNote) {
+        adStatusNote.textContent = 'No pudimos cargar el anuncio en este momento.';
+      }
+    }
+  };
+
+  tryInitAd();
+
+  consentListener = () => {
+    tryInitAd();
+  };
+  window.addEventListener(CONSENT_EVENT, consentListener);
 
   menuBtn.addEventListener('click', () => {
     sidebar.classList.toggle('collapsed');
@@ -206,6 +234,10 @@ export function initSidebar(onNewChat, onOpenSettings, user, onDeleteChat) {
 
   return {
     destroy: () => {
+      if (consentListener) {
+        window.removeEventListener(CONSENT_EVENT, consentListener);
+        consentListener = null;
+      }
       if (chatListUnsubscribe) {
         chatListUnsubscribe();
         chatListUnsubscribe = null;

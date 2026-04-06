@@ -237,7 +237,7 @@ function appendMessage(container, text, role, animate = true) {
   if (role === 'ai' && animate) {
     typeText(textContainer, text);
   } else {
-    textContainer.textContent = text;
+    renderMessageText(textContainer, text, role);
   }
 
   container.scrollTop = container.scrollHeight;
@@ -273,7 +273,7 @@ function typeText(element, text, speed = 20) {
   let i = 0;
   const timer = setInterval(() => {
     if (i < text.length) {
-      element.innerHTML += text.charAt(i);
+      element.textContent += text.charAt(i);
       i++;
       const container = element.closest('.messages-area');
       if (container) {
@@ -281,6 +281,72 @@ function typeText(element, text, speed = 20) {
       }
     } else {
       clearInterval(timer);
+      renderMessageText(element, text, 'ai');
     }
   }, speed);
+}
+
+function renderMessageText(element, text, role) {
+  if (role !== 'ai') {
+    element.textContent = text;
+    return;
+  }
+
+  element.innerHTML = formatAiMessage(text);
+}
+
+function formatAiMessage(text) {
+  const lines = text.split('\n');
+  const chunks = [];
+  let listItems = [];
+
+  const flushList = () => {
+    if (listItems.length === 0) return;
+    chunks.push(`<ul>${listItems.map((item) => `<li>${formatInline(item)}</li>`).join('')}</ul>`);
+    listItems = [];
+  };
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+
+    if (!trimmed) {
+      flushList();
+      chunks.push('<br>');
+      return;
+    }
+
+    if (/^[-*]\s+/.test(trimmed)) {
+      listItems.push(trimmed.replace(/^[-*]\s+/, ''));
+      return;
+    }
+
+    if (/^##\s+/.test(trimmed)) {
+      flushList();
+      chunks.push(`<h3>${formatInline(trimmed.replace(/^##\s+/, ''))}</h3>`);
+      return;
+    }
+
+    flushList();
+    chunks.push(`<p>${formatInline(trimmed)}</p>`);
+  });
+
+  flushList();
+
+  return chunks.join('');
+}
+
+function formatInline(text) {
+  const escaped = escapeHtml(text);
+  return escaped
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }

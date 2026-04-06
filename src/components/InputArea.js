@@ -32,6 +32,23 @@ export function initInputArea(onSend) {
   const textarea = container.querySelector('#chat-input');
   const sendBtn = container.querySelector('#send-btn');
   const chipsContainer = container.querySelector('#chips-container');
+  const mobilePlaceholderQuery = window.matchMedia('(max-width: 420px)');
+
+  const updatePlaceholder = () => {
+    textarea.placeholder = mobilePlaceholderQuery.matches
+      ? 'Escribe un mensaje'
+      : 'Introduce un mensaje aqui';
+  };
+  updatePlaceholder();
+
+  const handlePlaceholderChange = () => updatePlaceholder();
+  if (typeof mobilePlaceholderQuery.addEventListener === 'function') {
+    mobilePlaceholderQuery.addEventListener('change', handlePlaceholderChange);
+    cleanupCallbacks.push(() => mobilePlaceholderQuery.removeEventListener('change', handlePlaceholderChange));
+  } else if (typeof mobilePlaceholderQuery.addListener === 'function') {
+    mobilePlaceholderQuery.addListener(handlePlaceholderChange);
+    cleanupCallbacks.push(() => mobilePlaceholderQuery.removeListener(handlePlaceholderChange));
+  }
 
   const addChip = (text, iconSVG) => {
     const chip = document.createElement('div');

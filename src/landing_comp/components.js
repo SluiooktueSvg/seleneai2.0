@@ -80,10 +80,10 @@ export function HeroSection() {
 // Features Section Component
 export function FeaturesSection() {
   const features = [
-    { icon: 'brain', title: 'Advanced AI', description: 'State-of-the-art language models that understand and generate content with exceptional precision.' },
-    { icon: 'zap', title: 'Ultra Fast', description: 'Instant responses and real-time processing to maximize your productivity.' },
-    { icon: 'shield', title: 'Secure & Private', description: 'Your data is protected with enterprise-grade encryption and regulatory compliance.' },
-    { icon: 'barChart', title: 'Smart Analytics', description: 'Get deep insights and detailed metrics about your usage and performance.' }
+    { icon: 'brain', title: 'AI Assistance', description: 'Get help with drafting, rewriting, brainstorming, and general-purpose task support in a single chat workspace.' },
+    { icon: 'zap', title: 'Responsive Experience', description: 'Selene is designed to work across desktop and mobile browsers with a simple, focused interface.' },
+    { icon: 'shield', title: 'Privacy Controls', description: 'The site includes public privacy, terms, and contact pages so visitors can review how the service works.' },
+    { icon: 'barChart', title: 'Product Updates', description: 'The experience can continue evolving over time with interface improvements, feature changes, and policy updates published on the site.' }
   ];
 
   return `
@@ -158,6 +158,49 @@ export function CTASection() {
   `;
 }
 
+export function FAQSection() {
+  const faqs = [
+    {
+      question: 'What is Selene used for?',
+      answer: 'Selene is a web-based AI assistant designed to help with writing, coding, brainstorming, summaries, and general productivity tasks.'
+    },
+    {
+      question: 'Do I need an account to use Selene?',
+      answer: 'You can browse the public pages without signing in. A Google account is required when you want to access the in-app assistant experience.'
+    },
+    {
+      question: 'How does Selene handle privacy and ads?',
+      answer: 'Selene publishes privacy, terms, and contact information publicly. If ads are displayed, we also show a privacy choice so visitors can manage ad personalization preferences.'
+    },
+    {
+      question: 'Where can I contact the site owner?',
+      answer: 'Use the contact page for support, legal requests, or business questions. It is available from the footer on every public page.'
+    }
+  ];
+
+  return `
+    <section class="relative overflow-hidden px-4 py-24 sm:px-6 lg:px-8">
+      <div class="relative z-10 mx-auto max-w-4xl">
+        <div class="mb-12 text-center">
+          <h2 class="mb-4 text-3xl font-bold sm:text-4xl">Frequently Asked Questions</h2>
+          <p class="mx-auto max-w-2xl text-[var(--muted-foreground)]">
+            Clear information about how Selene works, how to contact us, and how privacy choices apply across the site.
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          ${faqs.map((faq, index) => `
+            <article class="card p-6 animate-fade-in-up-delay-${Math.min(index + 1, 6)}">
+              <h3 class="mb-2 text-lg font-semibold">${faq.question}</h3>
+              <p class="text-sm leading-relaxed text-[var(--muted-foreground)]">${faq.answer}</p>
+            </article>
+          `).join('')}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
 // Footer Component
 export function Footer() {
   const year = new Date().getFullYear();
@@ -177,6 +220,7 @@ export function Footer() {
             <a href="/privacy" class="text-sm text-[var(--muted-foreground)] transition-all duration-300 hover:text-purple-400 hover:tracking-wider active:text-purple-400 active:tracking-wider touch-manipulation">Privacy</a>
             <a href="/terms" class="text-sm text-[var(--muted-foreground)] transition-all duration-300 hover:text-purple-400 hover:tracking-wider active:text-purple-400 active:tracking-wider touch-manipulation">Terms</a>
             <a href="/contact" class="text-sm text-[var(--muted-foreground)] transition-all duration-300 hover:text-purple-400 hover:tracking-wider active:text-purple-400 active:tracking-wider touch-manipulation">Contact</a>
+            <a href="/privacy#advertising" class="text-sm text-[var(--muted-foreground)] transition-all duration-300 hover:text-purple-400 hover:tracking-wider active:text-purple-400 active:tracking-wider touch-manipulation">Ads & Cookies</a>
           </nav>
 
           <p class="text-sm text-[var(--muted-foreground)] transition-all duration-300 hover:text-[var(--foreground)]/80">

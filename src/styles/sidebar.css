@@ -365,6 +365,18 @@
 
 .sidebar.collapsed .recent-chats {
     overflow: hidden; /* Desactiva scroll dentro de la zona de chats al colapsar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.sidebar.collapsed .recent-chats::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.sidebar.collapsed #chat-list-container {
+    overflow: hidden;
 }
 
 /* Hide elements marked to hide */

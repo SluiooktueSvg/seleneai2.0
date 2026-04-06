@@ -55,6 +55,15 @@ class Router {
             app.innerHTML = route();
             app.style.opacity = '1';
             this.initializeInteractivity();
+
+            if (window.location.hash) {
+                const target = document.querySelector(window.location.hash);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    return;
+                }
+            }
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }, 200);
     }

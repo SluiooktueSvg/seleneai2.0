@@ -1,4 +1,5 @@
 import '../styles/settings.css';
+import { openChangelogModal } from './UpdateBanner';
 
 export function initSettingsModal(onLogout) {
   // Create modal container
@@ -57,6 +58,13 @@ export function initSettingsModal(onLogout) {
         <div class="setting-separator"></div>
 
         <div class="setting-item">
+          <button id="changelog-btn" class="secondary-action-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            View changelog
+          </button>
+        </div>
+
+        <div class="setting-item">
           <button id="logout-btn" class="logout-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
             Cerrar Sesión
@@ -74,6 +82,7 @@ export function initSettingsModal(onLogout) {
   const fontSizeSelect = modalOverlay.querySelector('#font-size-select');
   const speedSelect = modalOverlay.querySelector('#speed-select');
   const animationsToggle = modalOverlay.querySelector('#animations-toggle');
+  const changelogBtn = modalOverlay.querySelector('#changelog-btn');
   const logoutBtn = modalOverlay.querySelector('#logout-btn');
 
   const closeModal = () => {
@@ -137,6 +146,11 @@ export function initSettingsModal(onLogout) {
     } else {
       document.body.classList.add('no-animations');
     }
+  });
+
+  changelogBtn.addEventListener('click', () => {
+    closeModal();
+    setTimeout(() => openChangelogModal(), 180);
   });
 
   return { open: openModal };

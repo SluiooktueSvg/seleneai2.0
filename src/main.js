@@ -3,6 +3,8 @@ import './styles/login.css';
 import './styles/onboarding.css';
 import './styles/chat.css';
 import './styles/sidebar.css';
+import './styles/cookie-consent.css';
+import './styles/update-banner.css';
 
 // Componentes de la App
 import { initSidebar } from './components/Sidebar';
@@ -15,6 +17,8 @@ import { ConfirmModal } from './components/ConfirmModal';
 import { ChatHistoryService } from './services/history';
 import { initAFKMode } from './components/AFKMode';
 import { PresenceService } from './services/presence';
+import { initCookieConsent } from './components/CookieConsent';
+import { initUpdateBanner } from './components/UpdateBanner';
 
 // Componentes de la LANDING
 import { Router } from './landing_comp/router.js';
@@ -22,6 +26,8 @@ import { HomePage, FeaturesPage, PrivacyPage, TermsPage, ContactPage } from './l
 
 document.addEventListener('DOMContentLoaded', () => {
     let activeAppCleanup = null;
+    initCookieConsent();
+    initUpdateBanner();
 
     const routes = {
         '/': HomePage,
@@ -33,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const landingRouter = new Router(routes);
     landingRouter.setLoginHandler(() => AuthService.loginWithGoogle());
+
 
     const cleanupActiveApp = () => {
         if (activeAppCleanup) {

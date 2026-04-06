@@ -4,6 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "sync:selene-knowledge": "node scripts/sync-selene-knowledge.mjs",
+    "prebuild": "npm run sync:selene-knowledge",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"

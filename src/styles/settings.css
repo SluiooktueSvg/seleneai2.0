@@ -320,19 +320,58 @@ body.no-animations * {
     stroke-width: 2px;
 }
 
+.secondary-action-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.secondary-action-btn:hover {
+    background: rgba(168, 199, 250, 0.08);
+    border-color: rgba(168, 199, 250, 0.18);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(168, 199, 250, 0.1);
+}
+
+.secondary-action-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.secondary-action-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
     .modal-overlay {
-        padding: 16px;
-        align-items: flex-end;
+        padding: 20px 16px;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+        align-items: center;
+        justify-content: center;
+        overflow-y: auto;
     }
 
     .modal {
+        width: min(100%, 420px);
         max-width: 100%;
-        width: 100%;
-        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-        max-height: 85vh;
+        margin: auto;
+        border-radius: var(--radius-lg);
+        max-height: min(85dvh, 720px);
         overflow-y: auto;
+        transform: scale(0.92) translateY(24px);
     }
 
     .modal-header {
@@ -353,8 +392,8 @@ body.no-animations * {
 
     .setting-item {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
+        align-items: stretch;
+        gap: 10px;
         margin-bottom: var(--spacing-md);
     }
 
@@ -371,7 +410,51 @@ body.no-animations * {
         padding: 12px;
     }
 
+    .switch {
+        align-self: flex-start;
+    }
+
+    .secondary-action-btn,
     .logout-btn {
         padding: 14px;
+    }
+}
+
+@media (max-width: 420px) {
+    .modal-overlay {
+        padding: 12px;
+        padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .modal {
+        width: min(100%, 100vw - 24px);
+        max-height: calc(100dvh - 24px - env(safe-area-inset-bottom, 0px));
+        border-radius: 18px;
+    }
+
+    .modal-header {
+        padding: 14px 14px 12px;
+    }
+
+    .modal-header h2 {
+        font-size: 17px;
+    }
+
+    .modal-content {
+        padding: 14px;
+    }
+
+    .setting-item {
+        margin-bottom: 14px;
+    }
+
+    .setting-desc {
+        line-height: 1.4;
+    }
+
+    .setting-control select,
+    .secondary-action-btn,
+    .logout-btn {
+        min-height: 44px;
     }
 }

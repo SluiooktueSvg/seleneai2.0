@@ -1,5 +1,5 @@
 import { icons } from './router.js';
-import { Header, HeroSection, FeaturesSection, CTASection, Footer } from './components.js';
+import { Header, HeroSection, FeaturesSection, CTASection, FAQSection, Footer } from './components.js';
 
 // Home Page
 export function HomePage() {
@@ -8,6 +8,7 @@ export function HomePage() {
     <main>
       ${HeroSection()}
       ${FeaturesSection()}
+      ${FAQSection()}
       ${CTASection()}
     </main>
     ${Footer()}
@@ -17,10 +18,10 @@ export function HomePage() {
 // Features Page
 export function FeaturesPage() {
   const mainFeatures = [
-    { icon: 'brain', title: 'Advanced AI Models', description: 'Powered by cutting-edge language models that understand context, nuance, and intent with human-like comprehension.', benefits: ['Natural language understanding', 'Context-aware responses', 'Multi-turn conversations', 'Continuous learning'], color: 'from-blue-500 to-cyan-500' },
-    { icon: 'zap', title: 'Lightning Fast Processing', description: 'Experience instant responses with our optimized infrastructure designed for real-time AI interactions.', benefits: ['Sub-second response times', 'Parallel processing', 'Global CDN distribution', '99.9% uptime guarantee'], color: 'from-yellow-500 to-orange-500' },
-    { icon: 'shield', title: 'Enterprise Security', description: 'Your data is protected with military-grade encryption and compliance with international security standards.', benefits: ['End-to-end encryption', 'SOC 2 Type II certified', 'GDPR compliant', 'Regular security audits'], color: 'from-green-500 to-emerald-500' },
-    { icon: 'barChart', title: 'Intelligent Analytics', description: 'Gain deep insights into your usage patterns and optimize your workflow with detailed metrics.', benefits: ['Real-time dashboards', 'Custom reports', 'Usage predictions', 'ROI tracking'], color: 'from-purple-500 to-violet-500' }
+    { icon: 'brain', title: 'Practical AI Assistance', description: 'Selene focuses on everyday use cases such as writing help, idea generation, coding support, and question answering.', benefits: ['Prompt-based conversations', 'Chat history support', 'Suggestion shortcuts', 'General productivity help'], color: 'from-blue-500 to-cyan-500' },
+    { icon: 'zap', title: 'Focused Product Experience', description: 'The interface is built to keep the conversation readable and usable on both desktop and mobile screens.', benefits: ['Clean chat layout', 'Responsive input area', 'Mobile navigation support', 'Fast page transitions'], color: 'from-yellow-500 to-orange-500' },
+    { icon: 'shield', title: 'Transparent Site Policies', description: 'Visitors can review public pages that explain how the site works, how to get in touch, and how privacy choices affect ads.', benefits: ['Privacy page', 'Terms page', 'Contact page', 'Cookie choice banner'], color: 'from-green-500 to-emerald-500' },
+    { icon: 'barChart', title: 'Continuous Improvements', description: 'Selene can keep evolving as the product matures, with UI updates, policy clarifications, and new features added over time.', benefits: ['Interface refinements', 'Policy updates', 'Feature adjustments', 'Better mobile support'], color: 'from-purple-500 to-violet-500' }
   ];
 
   const capabilities = [
@@ -33,10 +34,10 @@ export function FeaturesPage() {
   ];
 
   const stats = [
-    { value: '99.9%', label: 'Uptime SLA' },
-    { value: '50ms', label: 'Avg Response' },
-    { value: '100+', label: 'Languages' },
-    { value: '10M+', label: 'Daily Requests' }
+    { value: 'Web', label: 'Browser Access' },
+    { value: 'AI', label: 'Assistant Workflow' },
+    { value: '24/7', label: 'Site Availability Goal' },
+    { value: 'Public', label: 'Policy Pages' }
   ];
 
   return `
@@ -76,7 +77,7 @@ export function FeaturesPage() {
               <span>Modern Teams</span>
             </h1>
             <p class="mx-auto max-w-2xl text-lg text-[var(--muted-foreground)] animate-fade-in-up-delay-2">
-              Discover how Selene transforms the way you work with AI-powered tools designed for productivity, creativity, and collaboration.
+              Learn what Selene offers today, how the experience is structured, and which public pages are available to support transparency and trust.
             </p>
           </div>
         </section>
@@ -130,7 +131,7 @@ export function FeaturesPage() {
           <div class="mx-auto max-w-7xl">
             <div class="mb-16 text-center">
               <h2 class="mb-4 text-3xl font-bold sm:text-4xl animate-fade-in-up">Everything You Need</h2>
-              <p class="mx-auto max-w-2xl text-[var(--muted-foreground)] animate-fade-in-up-delay-1">A comprehensive suite of AI tools for every use case</p>
+              <p class="mx-auto max-w-2xl text-[var(--muted-foreground)] animate-fade-in-up-delay-1">Core capabilities and site sections that help visitors understand the product before signing in</p>
             </div>
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               ${capabilities.map((cap, index) => `
@@ -183,11 +184,12 @@ export function FeaturesPage() {
 // Privacy Page
 export function PrivacyPage() {
   const sections = [
-    { icon: 'database', title: 'Information We Collect', content: 'We collect information you provide directly to us, such as when you create an account, use our services, or contact us. This includes your name, email address, and usage data to improve your AI experience.' },
-    { icon: 'eye', title: 'How We Use Your Information', content: 'We use the information we collect to provide, maintain, and improve our AI services, to communicate with you, and to personalize your experience. Your data helps us train and enhance our AI models while maintaining strict privacy standards.' },
-    { icon: 'lock', title: 'Data Security', content: 'We implement industry-standard security measures to protect your personal information. All data is encrypted in transit and at rest using AES-256 encryption. We regularly audit our security practices and maintain SOC 2 Type II compliance.' },
-    { icon: 'userCheck', title: 'Your Rights', content: 'You have the right to access, correct, or delete your personal information at any time. You can export your data, request account deletion, or opt-out of certain data collection practices through your account settings.' },
-    { icon: 'bell', title: 'Updates to This Policy', content: 'We may update this Privacy Policy from time to time. We will notify you of any significant changes by email or through a prominent notice on our platform at least 30 days before the changes take effect.' }
+    { icon: 'database', title: 'Information We Collect', content: 'We may collect account details provided through Google Sign-In, information submitted in contact forms, and the prompts or usage data required to operate the Selene experience.' },
+    { icon: 'eye', title: 'How We Use Information', content: 'We use this information to authenticate users, provide the AI assistant, improve reliability, answer support requests, prevent abuse, and maintain the service.' },
+    { icon: 'lock', title: 'Third-Party Services', content: 'Selene relies on third-party services such as Firebase, Google Sign-In, AI APIs, and Google AdSense. These services may process technical information needed to deliver authentication, hosting, analytics, or advertising.' },
+    { icon: 'shieldCheck', title: 'Advertising and Cookies', content: 'If advertising is enabled on Selene, Google may use cookies or similar technologies to measure ads and, where allowed, personalize them. Visitors can choose whether to accept advertising cookies or continue with essential cookies only.' },
+    { icon: 'userCheck', title: 'Your Rights', content: 'You can contact us to request access, correction, or deletion of personal data that we control. You can also manage local browser data by clearing stored site data in your browser settings.' },
+    { icon: 'bell', title: 'Policy Updates', content: 'We may update this Privacy Policy when our product, legal obligations, or advertising setup changes. The latest version will always be published on this page with a revised update date.' }
   ];
 
   return `
@@ -210,12 +212,12 @@ export function PrivacyPage() {
           <h1 class="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">
             Privacy <span class="gradient-text">Policy</span>
           </h1>
-          <p class="text-lg text-[var(--muted-foreground)]">Last updated: March 2026</p>
+          <p class="text-lg text-[var(--muted-foreground)]">Last updated: April 2026</p>
         </div>
 
         <div class="mb-12 rounded-2xl border border-[rgba(39,39,42,0.5)] bg-[var(--card)]/50 p-6 backdrop-blur-sm animate-fade-in-up-delay-1">
           <p class="text-[var(--muted-foreground)] leading-relaxed">
-            At Selene, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our AI platform. Please read this policy carefully to understand our practices regarding your personal data.
+            This Privacy Policy explains what Selene collects, how the service works with authentication, AI responses, and advertising, and what choices visitors have when cookies or Google ads are involved.
           </p>
         </div>
 
@@ -235,9 +237,18 @@ export function PrivacyPage() {
           `).join('')}
         </div>
 
+        <div id="advertising" class="mt-12 rounded-2xl border border-[rgba(39,39,42,0.5)] bg-[var(--card)]/50 p-6 backdrop-blur-sm animate-fade-in-up-delay-6">
+          <h2 class="mb-3 text-2xl font-semibold">Google AdSense and advertising disclosures</h2>
+          <div class="space-y-3 text-[var(--muted-foreground)] leading-relaxed">
+            <p>Selene may display advertising supplied by Google AdSense. Google and its partners may use cookies to serve and measure ads based on visits to this site or other websites.</p>
+            <p>You can choose to accept advertising cookies or continue with essential cookies only when the privacy banner is shown. If you decline advertising cookies, Selene can request non-personalized ads where supported.</p>
+            <p>For more information about how Google uses data in advertising, visit Google's advertising and privacy materials. If you are in a region where consent is required, additional consent messaging may apply before ads are requested.</p>
+          </div>
+        </div>
+
         <div class="mt-12 rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-500/10 to-violet-500/10 p-6 text-center backdrop-blur-sm animate-fade-in-up-delay-6">
           <h3 class="mb-2 text-lg font-semibold">Questions about your privacy?</h3>
-          <p class="mb-4 text-[var(--muted-foreground)]">Contact our privacy team for any concerns or requests.</p>
+          <p class="mb-4 text-[var(--muted-foreground)]">Use the contact page if you need help with privacy, cookies, account data, or advertising disclosures.</p>
           <a href="/contact">
             <button class="btn btn-primary">Contact Us</button>
           </a>
@@ -250,12 +261,12 @@ export function PrivacyPage() {
 // Terms Page
 export function TermsPage() {
   const sections = [
-    { icon: 'check', title: 'Acceptance of Terms', content: 'By accessing or using Selene AI services, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services. We reserve the right to update these terms at any time.' },
-    { icon: 'scale', title: 'Use of Services', content: 'You may use Selene AI for lawful purposes only. You agree not to use our services to generate harmful, illegal, or misleading content. Our AI tools are designed to assist and augment your work, not replace professional advice.' },
-    { icon: 'ban', title: 'Prohibited Activities', content: 'Users may not: attempt to reverse engineer our AI models, use the service for spam or harassment, violate intellectual property rights, share account credentials, or use automated systems to access our services without permission.' },
-    { icon: 'fileText', title: 'Intellectual Property', content: 'Content you create using Selene belongs to you, subject to our license to provide services. The Selene platform, including all AI models, software, and documentation, remains our exclusive property protected by intellectual property laws.' },
-    { icon: 'alertTriangle', title: 'Limitation of Liability', content: 'Selene AI is provided "as is" without warranties of any kind. We are not liable for any indirect, incidental, or consequential damages arising from your use of our services. Our total liability is limited to the amount you paid in the last 12 months.' },
-    { icon: 'refreshCw', title: 'Subscription & Cancellation', content: 'Paid subscriptions are billed monthly or annually. You may cancel at any time, and your access will continue until the end of the billing period. Refunds are available within 14 days of initial purchase for annual plans.' }
+    { icon: 'check', title: 'Acceptance of Terms', content: 'By accessing or using Selene, you agree to these Terms of Service. If you do not agree, please do not use the site or the authenticated assistant experience.' },
+    { icon: 'scale', title: 'Permitted Use', content: 'You may use Selene for lawful personal or business purposes. You are responsible for reviewing AI-generated output before relying on it in real situations.' },
+    { icon: 'ban', title: 'Prohibited Activities', content: 'You may not misuse the service to break the law, abuse authentication systems, scrape restricted data, interfere with site operations, or generate harmful or deceptive content.' },
+    { icon: 'fileText', title: 'Content and Ownership', content: 'You retain responsibility for the content you submit or generate. Selene, its branding, interface, and site code remain protected by applicable intellectual property laws.' },
+    { icon: 'alertTriangle', title: 'No Professional Advice', content: 'Selene can make mistakes. The service is provided for informational and productivity purposes and should not be treated as legal, medical, financial, or other professional advice.' },
+    { icon: 'refreshCw', title: 'Changes to the Service', content: 'We may update features, pricing, policies, or advertising placements as the project evolves. Material changes will be reflected on the site and in updated policy documents where appropriate.' }
   ];
 
   return `
@@ -278,12 +289,12 @@ export function TermsPage() {
           <h1 class="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">
             Terms of <span class="gradient-text">Service</span>
           </h1>
-          <p class="text-lg text-[var(--muted-foreground)]">Last updated: March 2026</p>
+          <p class="text-lg text-[var(--muted-foreground)]">Last updated: April 2026</p>
         </div>
 
         <div class="mb-12 rounded-2xl border border-[rgba(39,39,42,0.5)] bg-[var(--card)]/50 p-6 backdrop-blur-sm animate-fade-in-up-delay-1">
           <p class="text-[var(--muted-foreground)] leading-relaxed">
-            Welcome to Selene. These Terms of Service govern your use of our AI-powered platform and services. By using Selene, you enter into a binding agreement with us. Please read these terms carefully before proceeding.
+            These Terms of Service describe the basic rules for using Selene responsibly, including acceptable use, ownership, disclaimers, and site updates.
           </p>
         </div>
 
@@ -305,7 +316,7 @@ export function TermsPage() {
 
         <div class="mt-12 rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-500/10 to-violet-500/10 p-6 text-center backdrop-blur-sm animate-fade-in-up-delay-6">
           <h3 class="mb-2 text-lg font-semibold">Questions about our terms?</h3>
-          <p class="mb-4 text-[var(--muted-foreground)]">Our legal team is here to help clarify any concerns.</p>
+          <p class="mb-4 text-[var(--muted-foreground)]">Use the contact page if you need clarification about usage, content, or policy questions.</p>
           <a href="/contact">
             <button class="btn btn-primary">Contact Us</button>
           </a>
@@ -318,10 +329,10 @@ export function TermsPage() {
 // Contact Page
 export function ContactPage() {
   const contactInfo = [
-    { icon: 'mail', title: 'Email', value: 'support@selene.ai', description: 'Send us an email anytime' },
-    { icon: 'messageSquare', title: 'Live Chat', value: 'Available 24/7', description: 'Get instant support' },
-    { icon: 'mapPin', title: 'Office', value: 'San Francisco, CA', description: 'Visit our headquarters' },
-    { icon: 'clock', title: 'Response Time', value: 'Under 24 hours', description: 'We reply quickly' }
+    { icon: 'mail', title: 'Support', value: 'Use the contact form', description: 'Best option for product, privacy, or account questions' },
+    { icon: 'messageSquare', title: 'Policy Requests', value: 'Privacy and advertising', description: 'Reach out for cookies, AdSense, or data concerns' },
+    { icon: 'clock', title: 'Response Time', value: 'As soon as possible', description: 'We review requests in the order they arrive' },
+    { icon: 'shield', title: 'Site Notices', value: 'Public policy pages available', description: 'Privacy, terms, and contact details stay accessible on the site' }
   ];
 
   return `
@@ -345,7 +356,7 @@ export function ContactPage() {
             Get in <span class="gradient-text">Touch</span>
           </h1>
           <p class="mx-auto max-w-2xl text-lg text-[var(--muted-foreground)]">
-            Have questions about Selene? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+            Use this page for support, business questions, privacy requests, or advertising-related inquiries about Selene.
           </p>
         </div>
 
@@ -396,9 +407,11 @@ export function ContactPage() {
             `).join('')}
 
             <div class="rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-500/10 to-violet-500/10 p-6 backdrop-blur-sm animate-fade-in-up-delay-6">
-              <h3 class="mb-2 text-lg font-semibold">Looking for quick answers?</h3>
-              <p class="mb-4 text-[var(--muted-foreground)]">Check out our documentation and frequently asked questions.</p>
-              <button class="btn btn-outline border-purple-500/50 text-purple-400 hover:bg-purple-500/10">View Documentation</button>
+              <h3 class="mb-2 text-lg font-semibold">Need privacy or AdSense details?</h3>
+              <p class="mb-4 text-[var(--muted-foreground)]">You can also review our privacy and terms pages for cookie, advertising, and data-handling information.</p>
+              <a href="/privacy">
+                <button class="btn btn-outline border-purple-500/50 text-purple-400 hover:bg-purple-500/10">View Privacy Policy</button>
+              </a>
             </div>
           </div>
         </div>
